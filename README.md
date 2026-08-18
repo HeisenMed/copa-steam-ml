@@ -2,7 +2,7 @@
 
 Repositorio de análisis de datos y modelos predictivos de **Copa STEM**, la olimpiada de
 matemáticas y lógica de la **Fundación SapienceLab** para estudiantes de grados 9°, 10° y 11°
-de los municipios de **Copacabana** y **Girardota** (Antioquia, Colombia).
+de los municipios de **Copacabana**, **Girardota** y **Bello** (Antioquia, Colombia).
 
 El objetivo es transformar los datos de ~2.000 estudiantes inscritos (variables socioeconómicas,
 demográficas, de experiencia previa, resultado del examen y telemetría de comportamiento) en
@@ -32,6 +32,7 @@ ml-models/
 | **Demográficas** | `numero_documento`, `edad_calculada`, `genero`, `municipio`, `grado_escolar`, `tipo_institucion` |
 | **Socioeconómicas** | `estrato`, `jornada`, `con_quien_vive`, `computador_en_casa`, `internet_en_casa` |
 | **Experiencia previa** | `participacion_olimpiadas`, `nivel_programacion`, `nivel_robotica`, `herramientas_conocidas`, `areas_interes`, `interes_prog_robotica` |
+| **Perfil académico** | `promedio_academico`, `horas_estudio_matematicas`, `motivacion_participar`, `clases_extra_matematicas`, `gusto_logica` |
 | **Resultado** | `puntaje_obtenido` (0–100, variable objetivo) |
 | **Telemetría** | `tiempo_usado_segundos`, `cambios_pestana`, `intentos_copiar`, `intentos_pegar`, `intentos_click_derecho` |
 
@@ -77,6 +78,24 @@ Cada script es **autocontenido y reproducible** (`random_state=42`). Los gráfic
 | 3 | `08_vulnerabilidad_tecnologica.py` | Índice de vulnerabilidad tecnológica 0–100 |
 | 4 | `09_factor_analisis.py` | Factores que más pesan en el rendimiento |
 | 4 | `10_recomendaciones.py` | Recomendación de intervención por estudiante |
+
+---
+
+## Estado del modelo (Copa STEM 2026)
+
+| Modelo | R² | MAE | Uso en producción |
+|--------|----|-----|-------------------|
+| Random Forest (script 03) | ~0.238 | ~18 pts | `indice_potencial` (componente rendimiento) |
+| XGBoost (script 06) | — | — | `es_talento_oculto` |
+| K-Means k=4 (script 07) | — | — | `cluster_nombre` |
+| Modelo teórico (script 10) | — | — | `indice_condiciones` (knowledge-driven) |
+
+> **`puntaje_estimado` está en NULL en producción.** El R² negativo del modelo sobre variables
+> socioeconómicas puras indica que predecir la nota antes del examen no es viable con los datos
+> actuales. Se espera mejorar con las 5 preguntas nuevas cuando ~500 estudiantes las completen.
+
+> Los primeros ~2.000 estudiantes tienen NULL en las columnas de perfil académico — el modelo
+> maneja esto con imputación por mediana.
 
 ---
 
