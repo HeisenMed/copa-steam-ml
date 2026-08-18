@@ -1,0 +1,141 @@
+﻿numero_documento,nombres,apellidos,institucion_educativa,municipio,grado_escolar,estrato,tiene_computador,tiene_internet,puntaje_obtenido,motivo
+1035861361,Valery,Zapata sierra,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,100,Estrato 1-2
+1036519373,luciana,Castro zapata,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,100,Estrato 1-2
+1035856749,Juan jose,Rua zapata,I.E. Emiliano García,Girardota,11.0,2.0,No,Sí,100,Bajo acceso + estrato bajo
+1035857984,esteban,Suárez Orlas,I.E. Emiliano García,Girardota,11.0,3.0,No,Sí,100,Sin computador/internet
+1035424451,Emanuel,Ramírez Arroyave,I.E. Emiliano García,Girardota,11.0,2.0,No,Sí,100,Bajo acceso + estrato bajo
+1022006220,Jose Miguel,Saldarriaga Sepulveda,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,100,Estrato 1-2
+1057096101,Liedson,Cruz cortinez,I.E. Emiliano García,Girardota,10.0,2.0,No,Sí,100,Bajo acceso + estrato bajo
+1036519458,María Antonia,Ramírez Castrillón,I.E. Emiliano García,Girardota,11.0,2.0,No,Sí,100,Bajo acceso + estrato bajo
+1014669455,María José,González González,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,100,Estrato 1-2
+1025894876,Juan José,Vallejo Hoyos,I.E. Emiliano García,Girardota,9.0,3.0,No,Sí,100,Sin computador/internet
+1013344970,Joshua,Bermúdez Seguro,Colegio San Rafael,Copacabana,11.0,2.0,Sí,Sí,100,Estrato 1-2
+1029989055,Johan Esteban,Galindo Meneses,Colegio Neosistemas,Girardota,11.0,2.0,Sí,Sí,100,Estrato 1-2
+1032015955,Dylan Alexander,Restrepo Colorado,I.E. San Luis Gonzaga,Copacabana,9.0,3.0,No,Sí,100,Sin computador/internet
+1020307682,Juan Jose,Ruiz Sanchez,Instituto Parroquial Nuestra Señora de la Presentación,Girardota,10.0,2.0,Sí,Sí,100,Estrato 1-2
+1023640191,Jhonatan,Arroyave Muñoz,I.E. Gabriela Mistral,Copacabana,9.0,2.0,No,Sí,100,Bajo acceso + estrato bajo
+1044151099,Maria Angélica,Espinosa Cano,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,100,Estrato 1-2
+1022150422,Maria Paulina,Serna Betancur,I.E. Gabriela Mistral,Copacabana,11.0,2.0,No,No,100,Bajo acceso + estrato bajo
+1035422691,Emanuel,Correa Agudelo,I.E. Gabriela Mistral,Copacabana,11.0,2.0,No,Sí,100,Bajo acceso + estrato bajo
+1037975338,Marlen Sofía,López Arias,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,95,Estrato 1-2
+1042154218,Alejandro,Vergara Tilano,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,No,Sí,95,Bajo acceso + estrato bajo
+1036519444,Esteban,Villa Sánchez,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,95,Estrato 1-2
+1020454197,Samuel,Vanegas Osorio,I.E. Gabriela Mistral,Copacabana,9.0,2.0,No,Sí,95,Bajo acceso + estrato bajo
+1037265227,Ladys Tatiana,Rua Rua,I.E. San Luis Gonzaga,Copacabana,11.0,3.0,No,Sí,95,Sin computador/internet
+1036519856,Ana Sofía,Suárez García,Colegio Neosistemas,Girardota,9.0,2.0,Sí,Sí,95,Estrato 1-2
+1022152266,Samuel,Roldan Suárez,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,Sí,Sí,95,Estrato 1-2
+1129584069,Mariana,Vasquez Arismendy,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,No,Sí,95,Bajo acceso + estrato bajo
+1073240457,Benyamin,Román Rodríguez,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,1.0,Sí,Sí,95,Estrato 1-2
+1192465975,Maria Amparo,Molina Peña,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,No,No,95,Bajo acceso + estrato bajo
+1035867229,Salomé,Herrera Cortes,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,95,Estrato 1-2
+1025656556,Evelyn,García,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,95,Estrato 1-2
+1038871112,Juan Jose,Saldarriaga Muñoz,I.E. Emiliano García,Girardota,11.0,3.0,No,Sí,95,Sin computador/internet
+1145225602,Santiago,Vásquez Quintero,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,3.0,No,Sí,95,Sin computador/internet
+1035866834,Luciana,Morales Isaza,I.E. Emiliano García,Girardota,9.0,2.0,No,No,95,Bajo acceso + estrato bajo
+1017935112,Samuel,Arcila,I.E. José Miguel de Restrepo y Puerta,Copacabana,9.0,2.0,Sí,Sí,90,Estrato 1-2
+1035857860,Nikoll,Jimenez londoño,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,90,Estrato 1-2
+1035835572,Melissa,Ramos Echeverri,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,90,Estrato 1-2
+1036519556,Matias,Arias,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,90,Estrato 1-2
+6907304,Dilan Alejandro,Sánchez Yepes,I.E. Atanasio Girardot,Girardota,9.0,2.0,Sí,Sí,90,Estrato 1-2
+1033428522,Mariangel,Cordoba Rendón,Colegio Neosistemas,Girardota,9.0,2.0,Sí,Sí,90,Estrato 1-2
+1036519431,Michelle,Isaza C.,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,90,Estrato 1-2
+1122930684,Valeria,Otalora Ramírez,I. E. Presbítero Bernardo Montoya Giraldo,Copacabana,9.0,2.0,Sí,Sí,90,Estrato 1-2
+1035864230,Jerónimo,Gómez Alzate,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,90,Estrato 1-2
+1041056549,Harly,Morales,Colegio Neosistemas,Girardota,11.0,2.0,Sí,Sí,90,Estrato 1-2
+1036519687,Evelyn,Cadavid cordoba,Colegio Neosistemas,Girardota,10.0,2.0,Sí,Sí,90,Estrato 1-2
+1033491342,Daniel Thomas,Ospina Pino,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,90,Estrato 1-2
+1025894547,Ana María,Correa Marín,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,90,Estrato 1-2
+1025658789,Sofia,Alvarez Jimenez,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,90,Estrato 1-2
+1023594195,Juan Felipe,López Rojas,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,90,Estrato 1-2
+1020439898,Valeria,Mejia Valencia,I.E. San Luis Gonzaga,Copacabana,10.0,2.0,Sí,Sí,90,Estrato 1-2
+1033183747,Angie,Mesa Bran,I.E. San Luis Gonzaga,Copacabana,11.0,2.0,Sí,Sí,90,Estrato 1-2
+1077861822,Yerly Taliana,Barrera Murcia,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,No,Sí,90,Bajo acceso + estrato bajo
+1037974409,Valentina,Morales,I.E. Emiliano García,Girardota,11.0,3.0,No,No,90,Sin computador/internet
+1026149738,Valeria,Zapata manco,I.E. Emiliano García,Girardota,9.0,2.0,No,No,90,Bajo acceso + estrato bajo
+1077453150,Jhon Keimarc,Palacios Palacios,I.E. San Luis Gonzaga,Copacabana,11.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1068423410,Luis Manuel,Patiño Paez,I.E. San Luis Gonzaga,Copacabana,10.0,2.0,Sí,Sí,85,Estrato 1-2
+1036519453,Maximiliano,Sierra Cardona,Instituto Parroquial Nuestra Señora de la Presentación,Girardota,11.0,2.0,Sí,Sí,85,Estrato 1-2
+1026063484,Gehidy,Ruiz Zuleta,I.E. San Luis Gonzaga,Copacabana,11.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1035430253,Pablo,Castillo Ramirez,I.E. José Miguel de Restrepo y Puerta,Copacabana,9.0,2.0,Sí,Sí,85,Estrato 1-2
+1081919639,Aldair Moisés,Moreno arias,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,Sí,Sí,85,Estrato 1-2
+1198463918,José Manuel,Zapata Saldarriaga,I.E. José Miguel de Restrepo y Puerta,Copacabana,9.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1129584137,Emiliana,Sanchez Castillo,Instituto Parroquial Nuestra Señora de la Presentación,Girardota,11.0,2.0,Sí,Sí,85,Estrato 1-2
+1033427585,Juan Andrés,Echavarria,I.E. San Luis Gonzaga,Copacabana,10.0,1.0,No,No,85,Bajo acceso + estrato bajo
+1013347934,Yojan David,Rúa Henao,I.E. San Luis Gonzaga,Copacabana,10.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1011514145,Valeria,Escobar Escobar,Colegio Neosistemas,Girardota,11.0,2.0,Sí,Sí,85,Estrato 1-2
+1025659043,Nicole,Londoño parra,I.E. Emiliano García,Girardota,11.0,3.0,No,Sí,85,Sin computador/internet
+1035863582,Isaac,Ortega caro,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,85,Estrato 1-2
+1035425719,Maria Camila,Valderrama Peña,Colegio San Rafael,Copacabana,11.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1041633362,Simon,Palacio,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1129584321,Karen,Betancur Gómez,I.E. San Luis Gonzaga,Copacabana,10.0,1.0,No,Sí,85,Bajo acceso + estrato bajo
+1129584198,Salomé,Serna Vanegas,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,Sí,Sí,85,Estrato 1-2
+1036519670,Cristopher,Castañeda Serrano,Instituto Parroquial Nuestra Señora de la Presentación,Girardota,10.0,2.0,Sí,Sí,85,Estrato 1-2
+1035228857,Maria Camila,Ángel Muñoz,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1040876588,Maria José,Oquendo Orrego,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,No,Sí,85,Bajo acceso + estrato bajo
+1035865416,Sara,Bolaños Madrigal,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,85,Estrato 1-2
+1025660371,estiven,duque orozco,Colegio Cooperativo Juan del Corral,Copacabana,10.0,1.0,Sí,Sí,80,Estrato 1-2
+1129584353,Juliana,Londoño Uribe,Colegio Cooperativo Juan del Corral,Copacabana,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1036257738,Samuel,Zapata Saldarriaga,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,Sí,Sí,80,Estrato 1-2
+1036519935,Salomé,Henao Obando,I.E. Emiliano García,Girardota,9.0,2.0,No,Sí,80,Bajo acceso + estrato bajo
+1033492679,Jhonnier Andrés,González giraldo,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,80,Estrato 1-2
+1036519809,Salomé,Madrid Marín,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,80,Estrato 1-2
+1020305327,Sofia,Burbano Perdono,Colegio Neosistemas,Girardota,11.0,2.0,Sí,Sí,80,Estrato 1-2
+1036519491,Daniel,González M.,I.E. Emiliano García,Girardota,9.0,2.0,Sí,Sí,80,Estrato 1-2
+1036946175,Luciana,Jaramillo Ortiz,Colegio San Rafael,Copacabana,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1186463395,Matias,Cardona Diaz,Colegio Cooperativo Juan del Corral,Copacabana,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1023594375,Luciana,Valencia gaviria,I.E. José Miguel de Restrepo y Puerta,Copacabana,9.0,2.0,Sí,Sí,80,Estrato 1-2
+1036453050,Santiago,Baldovino,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1018247687,Maria Salomé,Zapata Hernandez,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,80,Estrato 1-2
+1036519638,Jerónimo,Rivera Álvarez,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,80,Estrato 1-2
+1020306846,Daniel Esteban,Cadavid Pérez,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,Sí,Sí,80,Estrato 1-2
+1032256303,Yunidis,Guerra,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,1.0,No,Sí,80,Bajo acceso + estrato bajo
+1023638972,María Camila,Henao Mangones,I.E. San Luis Gonzaga,Copacabana,11.0,2.0,Sí,Sí,80,Estrato 1-2
+1011401878,Johan,Cardona Gil,I.E. San Luis Gonzaga,Copacabana,9.0,2.0,No,Sí,80,Bajo acceso + estrato bajo
+1035864147,Jeronimo,Montes cataño,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1046668005,Jennifer,Leal Martinez,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,No,Sí,80,Bajo acceso + estrato bajo
+1017935031,miguel angel,zapata serna,I. E. Presbítero Bernardo Montoya Giraldo,Copacabana,9.0,2.0,Sí,Sí,80,Estrato 1-2
+1036519410,Juan José,Castrillón Cadavid,Colegio Nuestra Señora del Rosario,Girardota,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1040574951,Salomé,Castaño Echeverri,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,No,Sí,80,Bajo acceso + estrato bajo
+1020305862,Steven,Macias Gonzalez,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,Sí,Sí,80,Estrato 1-2
+1020226209,Luciana,Carvajal,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1022150324,Arlenson Ramiro,Carmona Vanegas,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,80,Estrato 1-2
+1036519976,Andrés,Castro Ortiz,Colegio Neosistemas,Girardota,9.0,2.0,Sí,Sí,75,Estrato 1-2
+1035228307,Angel,Alvarez Cuervo,Colegio Neosistemas,Girardota,9.0,2.0,Sí,Sí,75,Estrato 1-2
+1036519940,Juan Andrés,Sánchez Gutiérrez,Colegio Neosistemas,Girardota,9.0,2.0,Sí,Sí,75,Estrato 1-2
+1129584525,SAMANTHA,ZULUAGA CARDONA,Colegio La Asunción,Copacabana,9.0,2.0,Sí,Sí,75,Estrato 1-2
+1035425549,Samael,Uribe Gómez,Colegio Cooperativo Juan del Corral,Copacabana,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1018246166,Emanuel,Rivera Arias,Colegio Cooperativo Juan del Corral,Copacabana,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1129584371,juan camilo,castrillon vallejo,Colegio Cooperativo Juan del Corral,Copacabana,9.0,2.0,Sí,Sí,75,Estrato 1-2
+1011515595,Maria Alejandra,Saldarriaga Hernandez,Colegio Neosistemas,Girardota,9.0,2.0,Sí,Sí,75,Estrato 1-2
+1036519471,Kevin Smith,Hoyos Alzate,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1036519454,Deiby,Quiceno Zapata,I.E. Emiliano García,Girardota,11.0,2.0,No,Sí,75,Bajo acceso + estrato bajo
+1022150246,Erick Daniel,Camargo Zea,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1035855817,Andrés,Ortiz Bedoya,I.E. Emiliano García,Girardota,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1038870768,Hellen,Taborda Vanegas,I.E. Emiliano García,Girardota,11.0,2.0,No,Sí,75,Bajo acceso + estrato bajo
+1021929495,Ana isabel,Londoño gomez,I.E. Emiliano García,Girardota,10.0,2.0,Sí,Sí,75,Estrato 1-2
+1129584434,Mariana,Valencia Zuleta,I.E. Emiliano García,Girardota,10.0,3.0,No,Sí,75,Sin computador/internet
+1147487266,Laura Sofia,Pineda Estupiñan,Colegio Neosistemas,Girardota,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1017934000,Salome,Gomez Cordoba,Colegio San Rafael,Copacabana,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1036519531,Sebastian,Ochoa Sanchez,Colegio San Rafael,Copacabana,10.0,3.0,No,Sí,75,Sin computador/internet
+1021926597,Michel Sofia,Gil lopez,I.E. Atanasio Girardot,Girardota,9.0,3.0,No,No,75,Sin computador/internet
+1023529180,Luciana,Tobon,I.E. Atanasio Girardot,Girardota,9.0,3.0,No,Sí,75,Sin computador/internet
+4275653,Jimkeily De Los Angeles,Silva Carías,I. E. Presbítero Bernardo Montoya Giraldo,Copacabana,10.0,2.0,Sí,Sí,75,Estrato 1-2
+1018248953,Jeronimo,Rivera,I. E. Presbítero Bernardo Montoya Giraldo,Copacabana,10.0,2.0,Sí,Sí,75,Estrato 1-2
+1198463912,Jenifer,Sánchez E.,I.E. Emiliano García,Girardota,9.0,3.0,No,No,75,Sin computador/internet
+1036519915,Ana Sofía,Arias Alzate,I.E. Emiliano García,Girardota,9.0,3.0,No,No,75,Sin computador/internet
+1020305628,Isabela,Martinez Grisales,Colegio San Rafael,Copacabana,10.0,2.0,Sí,Sí,75,Estrato 1-2
+1033188306,Isabella,Vergara zapata,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1131224344,Mariana,Hernández Escudero,I.E. José Miguel de Restrepo y Puerta,Copacabana,9.0,2.0,Sí,Sí,75,Estrato 1-2
+1020307732,Isaac,García Avendaño,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,Sí,Sí,75,Estrato 1-2
+1031942406,Yiheive,Molina Loaiza,I.E. José Miguel de Restrepo y Puerta,Copacabana,9.0,3.0,No,Sí,75,Sin computador/internet
+1036454348,Emmanuel,Agudelo,I.E. José Miguel de Restrepo y Puerta,Copacabana,10.0,2.0,Sí,Sí,75,Estrato 1-2
+1035427935,Dyllan,Agudelo,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1025894098,Mariana,Betancur agudelo,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,3.0,No,Sí,75,Sin computador/internet
+1034996184,Samuel,Carvajal Forero,I.E. San Luis Gonzaga,Copacabana,10.0,3.0,No,Sí,75,Sin computador/internet
+1129584267,Ana Sofía,Sánchez Marín,I.E. San Luis Gonzaga,Copacabana,10.0,3.0,No,Sí,75,Sin computador/internet
+1038114339,Mariana,Alvarez Castro,I.E. José Miguel de Restrepo y Puerta,Copacabana,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1020442637,Santiago,Zapata,I.E. San Luis Gonzaga,Copacabana,11.0,2.0,Sí,Sí,75,Estrato 1-2
+1077857926,Jhossep David,Trujillo Claros,I.E. San Luis Gonzaga,Copacabana,11.0,3.0,Sí,No,75,Sin computador/internet
+1035425229,Salomé,Botero Santa,I.E. San Luis Gonzaga,Copacabana,11.0,1.0,Sí,Sí,75,Estrato 1-2
+1099683061,Sara Ximena,Rivera Feria,I.E. San Luis Gonzaga,Copacabana,11.0,1.0,No,Sí,75,Bajo acceso + estrato bajo
+1020305094,Luisa,Alzate Osorno,Instituto Parroquial Nuestra Señora de la Presentación,Girardota,11.0,2.0,Sí,Sí,75,Estrato 1-2
