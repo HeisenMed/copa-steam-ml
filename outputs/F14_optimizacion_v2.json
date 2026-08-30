@@ -1,0 +1,16 @@
+{
+  "best_params": {
+    "n_estimators": 200,
+    "min_samples_leaf": 8,
+    "max_features": 0.5,
+    "max_depth": null
+  },
+  "cv_r2": 0.1748746668603423,
+  "holdout_r2": 0.17663952657605664,
+  "holdout_mae": 14.995819066080928,
+  "baseline_r2": 0.16247738190718541,
+  "baseline_mae": 15.058918118869101,
+  "n_train": 918,
+  "n_test": 230,
+  "n_features": 23
+}
