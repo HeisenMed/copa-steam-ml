@@ -21,6 +21,16 @@ statsmodels 0.14 · pandas 3.0 · `random_state=42`
 > los estratos corregidos (distribución: estrato 1 = 95, 2 = 786, 3 = 797, sin
 > dato = 131). Las cifras de esta versión reemplazan a las de la anterior.
 
+> **Regla de este documento (vigente desde 2026-09-02).** Este archivo es la
+> **narración corrida** del proyecto: **cada script que se termine añade aquí su
+> propia sección**, al final, en vez de dejar la historia repartida solo entre
+> informes numerados sueltos. El informe individual de cada script sigue
+> existiendo en `reports/NN_*.md` con todo el detalle; lo que se añade aquí es el
+> relato —qué pregunta respondía ese paso, qué se hizo, qué se encontró— para que
+> el documento se pueda leer de principio a fin sin abrir nada más. Las secciones
+> anteriores **no se reescriben**: solo se añade al final, y el bloque
+> *Estado actual* se actualiza.
+
 ---
 
 ## Índice
@@ -33,6 +43,11 @@ statsmodels 0.14 · pandas 3.0 · `random_state=42`
 6. [Guía de replicación](#6-guía-de-replicación)
 7. [Limitaciones](#7-limitaciones)
 8. [Referencias](#8-referencias)
+9. [Fase 4 — Validación, puntaje estimado y modelo teórico (scripts 08–10)](#9-fase-4--validación-puntaje-estimado-y-modelo-teórico-scripts-0810)
+10. [Fase 5 — El experimento de las variables (scripts 11–13)](#10-fase-5--el-experimento-de-las-variables-scripts-1113)
+11. [Fase 5 — El modelo v2 y su evaluación en sombra (scripts 14–16)](#11-fase-5--el-modelo-v2-y-su-evaluación-en-sombra-scripts-1416)
+12. [Fase 5 — La vara de medir y el cierre del ciclo (scripts 17–19)](#12-fase-5--la-vara-de-medir-y-el-cierre-del-ciclo-scripts-1719)
+13. [Estado actual](#13-estado-actual)
 
 ---
 
@@ -926,3 +941,627 @@ pip install pandas numpy scikit-learn xgboost lightgbm \
 *Documento generado como referencia del trabajo de Machine Learning para Copa STEM
 2026 — Fundación SapienceLab. Todos los resultados son reproducibles con
 `random_state=42` siguiendo la §6.*
+
+---
+
+# 9. FASE 4 — VALIDACIÓN, PUNTAJE ESTIMADO Y MODELO TEÓRICO (scripts 08–10)
+
+> **Sobre esta parte del documento.** Las secciones 9 a 13 se añadieron el
+> 2026-09-02 para completar la narración hasta el script 19. Todo lo anterior
+> (§1–§8) quedó tal como estaba, con fecha 2026-07-06. Cuando una cifra de aquí
+> parezca contradecir una de allá, casi siempre es porque cambió la cohorte:
+> §1–§8 hablan de los 1,748–1,750 estudiantes del export de julio, y a partir de
+> §10 se trabaja con el export de agosto (3,072 examinados). Cada sección dice
+> con qué población está hablando.
+
+## 9.1 Script 08 — Framework de validación: ¿el R² bajo es un error o un hallazgo?
+
+**La pregunta.** El script 03 dejó un modelo con R² ≈ 0.085. Antes de sacar
+conclusiones de política con él había que responder algo incómodo: ¿ese número
+es un fallo del trabajo, o es la verdad sobre estos datos?
+
+**Qué se hizo.** Cuatro pruebas independientes sobre el mismo modelo de
+producción, sin cambiarlo: bootstrap de 1,000 remuestreos, un split temporal
+simulado (70 % de inscripciones más antiguas → 30 % más recientes), una curva de
+calibración de 10 bins y un cálculo de "techo teórico" a partir de estudiantes
+**gemelos** —parejas con exactamente las mismas features—.
+
+**Qué se encontró.**
+
+- **El poder predictivo es real, pequeño y estable.** Bootstrap: R² = 0.084 con
+  IC 95 % [0.053, 0.116]. El intervalo no toca el cero.
+- **El modelo es honesto.** El error medio de calibración es de 2.57 puntos: no
+  infla ni subestima de forma sistemática.
+- **Pero no se transporta bien a la cohorte más reciente.** En el 30 % de
+  inscripciones más nuevas el R² cae a −0.044, por debajo del IC 95 %. Hay
+  *concept drift* leve: **hay que re-validar con cada edición**, no asumir que
+  el R² se mantiene.
+- **El techo no lo pone el algoritmo, lo ponen las variables.** 1,569
+  estudiantes (98.9 %) tienen al menos un gemelo, repartidos en 85 grupos, y la
+  desviación de puntaje **dentro** de cada grupo es de 21.2 puntos frente a 22.8
+  de toda la población. Casi tanta variación adentro como afuera. El **techo
+  teórico de R² es ≈ 0.137**, y el modelo (0.085) ya estaba cerca.
+- **La varianza se reparte así:** 8.5 % la captura el modelo, 5.2 % es
+  alcanzable con mejores modelos o más datos, y **86.3 % es inexplicable con las
+  variables actuales**.
+
+**Lo que salió de aquí y marcó todo lo demás.** El informe propuso **cinco
+variables nuevas** para el formulario —promedio académico, horas de estudio de
+matemáticas, motivación para participar, clases extra de matemáticas y gusto por
+la lógica— con una proyección de R² de 0.25–0.40. Los scripts 11 a 14 existen
+porque esas preguntas se añadieron de verdad. Se entregó además
+`models/deploy/validation_framework.py`, con detección de *drift* por PSI y un
+veredicto automático `OK` / `RE-ENTRENAR` que se verificó contra una muestra
+perturbada a propósito.
+
+**En una frase:** el modelo no predice bien porque le faltan preguntas, no
+porque esté mal hecho — y el informe dijo exactamente qué preguntas añadir.
+
+## 9.2 Scripts 09 y 09b — El puntaje estimado: ¿quién rindió por encima de su contexto?
+
+**La pregunta.** Si el modelo sabe qué esperar de un perfil, la diferencia entre
+lo esperado y lo real es una medida de resiliencia. ¿Cuántos estudiantes
+superaron su expectativa?
+
+**Qué se hizo.** Se generó un `puntaje_estimado` para cada uno de los **1,748
+estudiantes** que presentaron, y se calculó `diferencia = real − estimado`.
+
+**Qué se encontró.** 634 estudiantes (36 %) superaron su expectativa por más de
+5 puntos, 305 (17 %) quedaron dentro de ±5 y 809 (46 %) por debajo. La diferencia
+media es **+0.06**, señal de que el modelo no tiene sesgo sistemático.
+
+El informe 09b insistió en la lectura honesta de la precisión, y es una
+distinción que se arrastra por todo el resto del proyecto:
+
+| Métrica | Dentro de muestra | Validación cruzada (honesta) |
+| --- | --- | --- |
+| R² | 0.241 | **0.084** |
+| MAE | 16.4 pts | **18.1 pts** |
+| RMSE | 20.1 pts | **22.1 pts** |
+
+Con un MAE de 18.1 puntos sobre una escala de 0 a 100, si el modelo dice 45 el
+estudiante real puede sacar entre 23 y 67. Por eso la diferencia se lee por
+tramos amplios y **nunca como un juicio sobre un estudiante concreto**.
+
+**En una frase:** un tercio de los estudiantes rindió por encima de lo que su
+contexto hacía esperar, pero el margen de error del modelo es tan ancho que solo
+sirve para mirar grupos, no personas.
+
+## 9.3 Script 10 — Modelo teórico vs empírico: ¿los datos se comportan como dice la literatura?
+
+**La pregunta.** El modelo empírico aprendió de los datos reales. Si en esos
+datos hay trampa o sesgo, el modelo aprendió también la trampa y el sesgo.
+¿Cómo contrastarlo sin usar los mismos datos?
+
+**Qué se hizo.** Se construyó un `indice_condiciones` (0–100) **teórico**, cuyos
+pesos salen únicamente de la literatura educativa (OECD PISA, UNESCO,
+meta-análisis de nivel socioeconómico) y de ningún resultado de Copa STEM. La
+fórmula es `50 + Σ ajustes`, recortada a [5, 95]: computador ±3, internet ±2,
+estrato −3/0/+2, estructura familiar ±1, nivel de programación de −3 a +8, nivel
+de robótica de −1 a +4, olimpiadas +5, interés −2/0/+3, herramientas −2/0/+3.
+Cada peso tiene su fuente escrita al lado. Deliberadamente **no** usa municipio,
+grado, género ni institución, por estar potencialmente contaminados.
+
+**Qué se encontró.**
+
+| Modelo | R² vs real | MAE | r (Pearson) |
+| --- | --- | --- | --- |
+| Empírico (Random Forest) | 0.241 | 16.4 | 0.504 |
+| Teórico (literatura) | −0.202 | 21.7 | 0.191 |
+
+El R² del teórico no es comparable en escala —mide *condiciones*, no la nota—,
+así que la lectura justa es la correlación. Y el dato que importa es que
+**teórico y empírico correlacionan r = 0.466**: dos modelos construidos por
+caminos independientes apuntan en la misma dirección, lo que es evidencia de que
+los datos de Copa STEM reflejan en buena medida los patrones que la literatura
+espera.
+
+El índice también sirvió de detector independiente: marcó **16 casos de alta
+sospecha** (resultado demasiado bueno para el contexto *y* examen en menos de 30
+minutos), de los cuales **0 eran nuevos** —la telemetría del script 05 ya los
+había marcado a todos—. Y, sin mirar la nota, identificó **32 estudiantes en
+condiciones adversas (índice < 45) que sacaron ≥ 60**: talento oculto claro.
+
+**En una frase:** se construyó un segundo modelo que no mira los resultados de
+Copa STEM, y coincide con el que sí los mira — señal de que los datos son
+creíbles.
+
+---
+
+# 10. FASE 5 — EL EXPERIMENTO DE LAS VARIABLES (scripts 11–13)
+
+Aquí empieza el export de agosto de 2026: **3,077 inscritos**, con las cinco
+preguntas que había propuesto el script 08 ya incorporadas al formulario. La
+pregunta de fase es una sola, y es la que el script 08 dejó abierta.
+
+## 10.1 Script 11 — Preparación: cuatro datasets para separar dos efectos
+
+**La pregunta.** Cuando un modelo mejora tras un año, ¿mejoró porque hay más
+datos o porque hay mejores variables? Comparar el modelo viejo contra uno nuevo
+no lo distingue: cambian las dos cosas a la vez.
+
+**Qué se hizo.** Se cortaron cuatro datasets del mismo export:
+
+| Dataset | Filas | Qué aísla |
+| --- | --- | --- |
+| **A** `dataset_A_baseline.csv` | 1,735 | Línea base — la cohorte del primer modelo |
+| **B** `dataset_B_completo.csv` | 3,072 | Efecto de **más datos** |
+| **C** `dataset_C_perfil.csv` | 1,148 | Efecto de **más variables** |
+| **C′** `dataset_C_sin_features.csv` | 1,148 | **Control** de C — las mismas filas, sin las 5 variables |
+
+La pieza clave es **C′**. C y C′ comparten las mismas 1,148 filas y la misma
+partición train/test; lo único que las separa son las cinco columnas nuevas. Sin
+ese control, cualquier mejora en C sería ambigua: C también es una población más
+reciente y de otros municipios.
+
+Se dejó fuera siempre la columna `porcentaje`, duplicado exacto del target en
+escala 0–100: incluirla daría un R² cercano a 1 que no significa nada. Es el caso
+de libro de *fuga de información*.
+
+**En una frase:** antes de entrenar nada, se montó el experimento de forma que la
+respuesta no pudiera salir ambigua.
+
+## 10.2 Script 12 — El experimento: más datos o mejores preguntas
+
+**La pregunta.** ¿Qué mueve el R²: el volumen o la calidad de las variables?
+
+**Qué se hizo.** El mismo Random Forest, el mismo protocolo del script 03
+(`n_estimators=300, max_depth=10, min_samples_leaf=8`, KFold 5 + hold-out del
+20 % estratificado, imputación ajustada solo con el train), entrenado sobre los
+cuatro datasets.
+
+**Qué se encontró.**
+
+| Dataset | Rol | n | Features | CV R² | CV MAE | Test R² | Test MAE |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| A_baseline | Línea base | 1,735 | 18 | +0.086 | 19.01 | +0.111 | 19.18 |
+| B_completo | Más datos | 3,072 | 19 | +0.053 | 17.95 | +0.035 | 17.94 |
+| **C_perfil** | **Más variables** | **1,148** | **23** | **+0.180** | **14.84** | **+0.162** | **15.06** |
+| C_sin_features | Control de C | 1,148 | 18 | +0.098 | 15.72 | +0.113 | 15.78 |
+
+- **Duplicar los datos no sirvió.** De A a B, con casi el doble de filas, el R²
+  **bajó** de +0.086 a +0.053.
+- **Las cinco variables nuevas sí sirvieron.** Con la muestra fija en 1,148
+  filas, C′ → C lleva el R² de +0.098 a **+0.180**: prácticamente el doble, y el
+  MAE baja 0.88 puntos. Es el único contraste que es un experimento controlado en
+  sentido estricto.
+- **Cinco variables de conducta superan a dieciocho de origen.** Por bloques
+  separados: solo socioeconómicas (18 features) → R² +0.098; **solo las 5
+  académicas → +0.108**; ambas juntas → +0.180.
+
+Merece registrarse un tropiezo que el propio informe documenta: en una primera
+corrida el dataset B arrastró físicamente las 5 columnas nuevas (casi vacías) y
+apareció con 24 features en vez de 19, lo que mezclaba los dos efectos que el
+experimento pretendía separar. Al corregirlo, **el R² de B cayó de +0.092 a
++0.053**: el número contaminado sugería que más datos ayudaban un poco; el número
+limpio muestra lo contrario.
+
+**En una frase:** acumular más inscritos con el formulario viejo no mejora nada;
+preguntar mejor duplicó la capacidad de predicción.
+
+## 10.3 Script 13 — Explicabilidad: cuáles variables pesan de verdad
+
+**La pregunta.** El script 12 demostró **que** las variables nuevas ayudan. Falta
+saber **cuáles** y **cuánto**.
+
+**Qué se hizo.** Dos medidas de importancia sobre el dataset C: MDI (la que trae
+gratis el bosque, sesgada hacia variables con muchos valores distintos) e
+**importancia por permutación** —cuánto empeora el R² en datos no vistos al
+desordenar una variable—, con 30 repeticiones por variable y calculada sobre las
+columnas **crudas**, antes del one-hot, para que `municipio` cuente una sola vez.
+Cuando las dos discrepan, manda la permutación.
+
+**Qué se encontró.**
+
+| # | Variable | ΔR² | ± | Bloque |
+| --- | --- | --- | --- | --- |
+| 1 | **Promedio académico** | **+0.1040** | 0.0291 | Perfil académico |
+| 2 | Grado escolar | +0.0380 | 0.0143 | Contexto |
+| 3 | Municipio | +0.0246 | 0.0094 | Contexto |
+| 4 | Participó en olimpiadas | +0.0187 | 0.0157 | Experiencia previa |
+| 5 | Gusto por la lógica | +0.0117 | 0.0148 | Perfil académico |
+| 6 | Tipo de institución | +0.0104 | 0.0054 | Contexto |
+| 9 | Estrato | +0.0020 | 0.0074 | Socioeconómico |
+| 12 | Computador en casa | +0.0001 | 0.0015 | Socioeconómico |
+
+- **`promedio_academico` domina**: desordenarla cuesta 0.104 de R², **2.7 veces
+  más** que la segunda variable, y más que las variables 2, 3 y 4 sumadas. Es el
+  resultado esperable —el mejor predictor del rendimiento futuro es el
+  rendimiento pasado— pero hasta agosto el proyecto no tenía cómo medirlo.
+- **El acceso a tecnología no predice la nota.** `computador_en_casa`
+  (+0.0001 ± 0.0015) e `internet_en_casa` (−0.0000) son indistinguibles de cero.
+  El estrato tampoco (+0.0020 ± 0.0074).
+- **El contexto no desaparece, pero deja de encabezar.** En la cohorte A, sin
+  perfil académico, el ranking lo lideraba `municipio` (+0.0809) seguido de
+  `grado_escolar` (+0.0717). Con el perfil añadido, ambos siguen en los puestos 2
+  y 3, pero desplazados.
+- **Honestidad sobre las barras de error:** solo los puestos 1, 2, 3 y 6 tienen
+  una señal claramente mayor que su propia incertidumbre. Varias variables tienen
+  desviación mayor que su importancia, y seis salieron con importancia negativa
+  —el modelo predice *mejor* sin ellas—.
+
+**Nota de coherencia con §4.1 y §5.** Que el estrato y el computador no predigan
+la *nota* no contradice las brechas del §4: son preguntas distintas. Una cosa es
+si un factor **separa grupos** en promedio, y otra si **añade capacidad
+predictiva** una vez que el modelo ya conoce el promedio académico del
+estudiante. La recomendación de dotación + acompañamiento del §5 sigue en pie por
+equidad; lo que este informe dice es que el acceso a tecnología no sirve para
+*predecir* la nota individual.
+
+**En una frase:** preguntar por el promedio del colegio predice más que todo el
+bloque socioeconómico junto.
+
+---
+
+# 11. FASE 5 — EL MODELO v2 Y SU EVALUACIÓN EN SOMBRA (scripts 14–16)
+
+## 11.1 Script 14 — Optimización de hiperparámetros y nacimiento del modelo v2
+
+**La pregunta.** Ya se sabe qué variables sirven. ¿Cuánto más se puede exprimir
+ajustando el estimador?
+
+**Qué se hizo.** `RandomizedSearchCV` sobre `RandomForestRegressor` en el dataset
+C: 30 candidatos × 5 folds = **150 ajustes**, `scoring='r2'`. El ganador se
+reajustó sobre las 1,148 filas completas y se exportó como artefacto de
+producción: `models/mejor_modelo_puntaje_v2.joblib` y
+`models/deploy/potencial_stem_predictor_v2.js`.
+
+**Qué se encontró.**
+
+- **Ganadores:** `n_estimators=200`, `max_depth=None`, `min_samples_leaf=8`,
+  `max_features=0.5`. R² de CV del mejor candidato: **+0.1749**.
+- **Hold-out del 20 %: R² +0.1766, MAE 15.00.**
+- **La ganancia de la búsqueda es marginal: +0.0142 de R²** frente a los
+  hiperparámetros sin optimizar del script 03 sobre la misma partición
+  (+0.1625). El MAE apenas se mueve (−0.06 puntos).
+- El predictor JS quedó **verificado en Node**: reproduce a sklearn con
+  `máx|Δ| = 3.55e-14`, y mantiene el mismo contrato de salida que v1.
+
+La lectura es coherente con el informe 12: **la elección de hiperparámetros es
+secundaria**. Lo que movió el R² fueron las variables (+0.083 al añadir el perfil
+académico), no el ajuste del estimador (+0.014).
+
+**Sobre el alcance.** La instrucción original pedía reentrenar los cuatro
+predictores con la rejilla optimizada, pero **solo uno de los cuatro es un
+`RandomForestRegressor`**: talento oculto es un `XGBClassifier`, clustering es
+`KMeans` (su único hiperparámetro es `k`) y condiciones es el modelo teórico del
+script 10, cuyos pesos vienen de la literatura y no se entrenan. Reentrenarlos
+sobre C habría sido un cambio de semántica disfrazado de optimización, así que
+quedaron fuera a propósito.
+
+**En una frase:** afinar el modelo aportó una décima parte de lo que aportó
+cambiar las preguntas del formulario.
+
+## 11.2 Script 15 — Scores v2 en sombra: ¿qué cambiaría si se desplegara?
+
+**La pregunta.** Antes de tocar producción: si mañana se despliega v2, ¿qué
+cambia para los estudiantes que ya están en la tabla?
+
+**Qué se hizo.** Se calculó **en sombra** el vector completo de `ml_scores` para
+los 3,072 examinados, con estrategia híbrida —v2 para los 1,148 con perfil
+académico, v1 para los 1,924 restantes— sin tocar ningún modelo ni la tabla de
+producción. Resultado en `outputs/ml_scores_v2.csv` (3,072 × 18).
+
+**Qué se encontró, y es el hallazgo más incómodo de la fase.**
+
+- **`indice_potencial` apenas se mueve**: cambio medio de −0.61 puntos (rango
+  −3.84 … +3.39), y el **88.8 %** no cambia de categoría.
+- **Y ese pequeño cambio no lo produce el modelo.** El índice compuesto usa el
+  puntaje **real** cuando el estudiante presentó el examen, y los 3,072 lo
+  presentaron. El código lo dice literalmente: `if presento: rend_raw = real`, y
+  el modelo no se invoca. **El modelo v2 no interviene en el índice de ningún
+  estudiante de esta cohorte.** Lo único que cambia es `ref_rendimiento`, la
+  distribución contra la que se percentiliza.
+- **Donde v2 sí gana es en `puntaje_estimado`:** MAE de **18.45 → 15.00** frente
+  al valor real (−19 %), usando la cifra honesta de validación. El informe es
+  explícito en no usar el 12.54 que sale al medir sobre las mismas filas de
+  entrenamiento: eso mide memorización.
+- **Pero `puntaje_estimado` está fijado a `null` en la Edge Function.** Desplegar
+  v2 tal cual **no cambiaría nada visible** para quien ya presentó el examen.
+
+Y una señal de alarma que el informe registró sin resolver: la distribución de
+categorías se **desplaza hacia los extremos**. En el subgrupo de v2, "Talento
+destacado" pasaba de 30 a 51 (+21) y "Requiere apoyo" de 131 a 182 (+51),
+mientras "Promedio" se vaciaba (−57). El informe ya lo atribuyó a percentilizar
+contra una cohorte más pequeña y menos dispersa (σ 20.54 en C frente a 22.66 en
+B). Ese diagnóstico es el que recogió el script 17.
+
+**En una frase:** el modelo nuevo no cambiaría casi nada para quien ya hizo el
+examen, y el poco cambio que se veía venía de la vara de medir, no del modelo.
+
+## 11.3 Script 16 — Las figuras de la comparación v1 vs v2
+
+**La pregunta.** Ninguna nueva: es un script de comunicación.
+
+**Qué se hizo.** Sin entrenar ni recalcular nada, se leyeron los artefactos ya
+generados (`outputs/F15_comparacion_v1_v2.csv` y `outputs/F13_importancias.csv`)
+y se produjeron cuatro figuras: conteo por categoría v1 vs v2
+(`comparacion_categorias_v1_v2.png`), histogramas superpuestos del índice
+(`distribucion_potencial_v1_v2.png`), estimado v2 contra real con la diagonal de
+predicción perfecta (`puntaje_estimado_vs_real.png`) y top 10 de importancia por
+permutación en A vs C (`feature_importance_comparacion.png`).
+
+**Nota honesta.** Es el único script del proyecto **sin informe propio** en
+`reports/`; su documentación vive en la cabecera del script y en las propias
+figuras. La cabecera deja anotada una advertencia que conviene repetir: el MAE
+visible en el scatter (12.54) es **dentro de muestra**, porque el modelo v2 se
+reajustó sobre esas mismas 1,148 filas; la cifra honesta es la del hold-out del
+script 14 (15.00). Ambas se escriben en la figura para que nadie tome la
+optimista por buena.
+
+**En una frase:** cuatro gráficos para ver de un vistazo lo que los informes 13 y
+15 ya decían, con la advertencia impresa encima para que no se malinterprete.
+
+---
+
+# 12. FASE 5 — LA VARA DE MEDIR Y EL CIERRE DEL CICLO (scripts 17–19)
+
+## 12.1 Script 17 — Corrección de `ref_rendimiento`: contra quién se compara
+
+**La pregunta.** El informe 15 encontró que 72 estudiantes cambiaban de categoría
+de potencial **sin que su desempeño hubiera cambiado en nada**. ¿Por qué?
+
+**Qué se hizo.** El componente de rendimiento —el 50 % del índice— no usa el
+puntaje crudo, usa su **percentil**. Y percentilizar siempre es "contra quién".
+El script 14 había entrenado el modelo sobre el dataset C y, de paso, había
+calculado la referencia sobre esa misma población de 1,148. Son dos usos
+distintos de los datos que quedaron acoplados sin necesidad: para **entrenar**
+hace falta C, porque es donde están las variables nuevas; para **comparar** hace
+falta B, porque es donde están todos los examinados.
+
+El script recalculó `ref_rendimiento` sobre los **3,072** de
+`dataset_B_completo.csv`, volvió a puntuar a todos con la misma estrategia
+híbrida y los mismos modelos, y guardó la referencia en
+`outputs/F17_ref_rendimiento_corregido.json`.
+
+**Qué se encontró.**
+
+| Referencia | n | Media | σ |
+| --- | --- | --- | --- |
+| v1 (cohorte histórica) | 1,750 | 41.81 | 23.11 |
+| v2 tal como estaba (dataset C) | 1,148 | 41.08 | **20.53** |
+| **v2 corregida (dataset B)** | **3,072** | 41.74 | **22.66** |
+
+La cohorte C es **más apretada**. Al medir contra una población menos dispersa,
+un puntaje que antes caía en el montón central se despega hacia un extremo: no
+porque el estudiante haya mejorado o empeorado, sino porque sus vecinos de
+comparación se parecen más entre sí.
+
+- **La redistribución artificial desaparece.** En la cohorte completa, "Talento
+  destacado" vuelve de 126 a **105** —exactamente el conteo de v1— y "Requiere
+  apoyo" baja de 478 a 456.
+- **El desplazamiento hacia los extremos cae de 72 a 29 estudiantes** en la
+  cohorte completa, y de 72 a 17 en el subgrupo de v2.
+- **Las predicciones del modelo no se tocaron.** `ref_rendimiento` solo entra en
+  `_percentil`, nunca en `_predict_puntaje`: `puntaje_estimado` salió idéntico
+  fila a fila al del script 15, con máximo |Δ| = 0.000000 sobre 3,072 filas.
+- El talento oculto se mueve de 607 (v1) a 609: despreciable, como era de
+  esperar.
+
+También se corrigió la referencia del **fallback v1**: dejar a los 1,924 sin
+perfil midiéndose contra la cohorte histórica de 1,750 habría creado un segundo
+artefacto, dos escalas conviviendo en la misma tabla. Se verificó que los 1,750
+puntajes viejos están contenidos íntegramente en los 3,072 nuevos.
+
+**En una frase:** 72 estudiantes cambiaban de etiqueta solo porque se les
+comparaba con el grupo equivocado, y ahora se les compara con todos los que
+presentaron el examen.
+
+## 12.2 Script 18 — Los que no se presentaron: la población donde el modelo sí manda
+
+**La pregunta.** Los scripts 15 y 17 puntuaron a los que ya tienen nota, y ahí el
+modelo ni se invoca. ¿Qué pasa con los inscritos que **no** presentaron el
+examen, que es justo donde el modelo decide el índice?
+
+**Qué se hizo.** Esa población no estaba en ningún export: todos los `data/*.csv`
+son un *inner join* con `resultados_prueba_copa_stem`. Hubo que exportarla aparte
+de Supabase (249 filas) y hacer el anti-join explícito. Quedaron **248
+estudiantes**, con cero solapamiento con los 3,072 examinados. Se les aplicó la
+misma estrategia híbrida y la referencia corregida de 3,072, sin forzar nada: se
+le pasa a `calcular_indice` un registro sin `puntaje_obtenido` y la función toma
+sola la rama del modelo. Es exactamente el código que corre en la Edge Function.
+
+**Qué se encontró.** Tres cosas, y las tres son advertencias.
+
+**1. El índice sin nota está comprimido y no es comparable con el de un
+examinado.** No es un ajuste fino: son dos escalas. σ = 8.97 frente a 22.37.
+
+| Categoría | Sin examen | % | Examinados | % |
+| --- | --- | --- | --- | --- |
+| Talento destacado | **0** | 0.0 % | 105 | 3.4 % |
+| Alto potencial | 3 | 1.2 % | 721 | 23.5 % |
+| Promedio | 110 | 44.4 % | 1,006 | 32.7 % |
+| En desarrollo | **135** | 54.4 % | 784 | 25.5 % |
+| Requiere apoyo | **0** | 0.0 % | 456 | 14.8 % |
+
+245 de 248 (98.8 %) caen en dos categorías y los dos extremos se vacían. Hay dos
+causas: el modelo comprime el insumo (σ del estimado 9.20 frente a 22.66 de la
+nota real, correlación 0.52) y, sin nota, la resiliencia se calcula como
+`max(0, 50 − adversas×5)`, que solo produce cinco valores entre 30 y 50 (σ 5.05
+frente a 30.58). Y hay un límite duro: **"Talento destacado" es inalcanzable por
+construcción**, porque el techo aritmético del índice sin nota es **83.33**, por
+debajo del umbral de 85. No es que no haya salido ninguno: no puede salir. El
+máximo real observado fue 72.3.
+
+**2. La detección de talento oculto no funciona en este grupo.** Cero marcados,
+probabilidad máxima 0.0031. La regla determinista exige puntaje ≥ 60 o índice
+≥ 75, y el clasificador usa el puntaje como feature. Es un artefacto del método,
+no una propiedad de la población — que sí tiene materia prima: **175 de 248
+(70.6 %) tienen 3 o más condiciones adversas**.
+
+**3. Los que no se presentaron están en peores condiciones.** Este hallazgo se
+sostiene porque `indice_condiciones` es teórico y no usa el puntaje: 21.4 % en
+condiciones adversas frente al 10.6 % de los examinados, y los dos perfiles de
+cluster con menos recursos concentran 42.4 % de los no examinados frente a 23.9 %
+de los examinados. La no presentación está correlacionada con la desventaja, así
+que **todas las brechas del §4.1 están subestimadas**: los más desfavorecidos se
+cayeron de la muestra antes de generar un dato.
+
+Sobre `puntaje_estimado` para este grupo: media 39.67, σ 8.79, rango 25.6–69.5,
+con MAE de ±15.00. El 50 % central cabe en 13 puntos (32.2 a 45.3), **una franja
+más estrecha que la propia barra de error**. Ordenar a esta población por esa
+columna es ordenar ruido.
+
+**En una frase:** los estudiantes que se inscribieron y no se presentaron son
+justamente los que están peor, y el índice actual no sabe distinguirlos entre sí.
+
+## 12.3 Script 19 — Propagar la corrección al artefacto que se despliega
+
+**La pregunta.** El script 17 corrigió la referencia en el pipeline de Python y
+en los CSV. ¿Llegó esa corrección al fichero que realmente consume la web?
+
+**Qué se hizo.** No había llegado. `models/deploy/potencial_stem_predictor_v2.js`
+—el artefacto que lee la Edge Function— seguía llevando embebida, dentro de su
+constante `SPEC`, la referencia vieja de **1,148**. Desplegarlo tal cual habría
+reintroducido por la puerta de atrás el problema que el script 17 existió para
+eliminar.
+
+El script 19 reutiliza el proceso de exportación del script 14 con una
+diferencia: clona el cuerpo del `.js` **v2** y sustituye solo la línea de la
+constante `SPEC`, de modo que el cuerpo del artefacto se conserva byte a byte y
+el contrato con la Edge Function no cambia. Antes de regenerar nada comprueba la
+procedencia: los árboles y el preprocesamiento extraídos de
+`mejor_modelo_puntaje_v2.joblib` se comparan bit a bit contra los embebidos en el
+`.js` vigente (ambos coinciden). El resultado se escribe como **fichero nuevo**,
+`potencial_stem_predictor_v2_corrected.js`; el viejo no se toca.
+
+**Qué se encontró / se verificó.**
+
+| Referencia embebida | n | σ | Cohorte |
+| --- | --- | --- | --- |
+| Antes | 1,148 | 20.5332 | `dataset_C_perfil.csv` (entrenamiento) |
+| **Después** | **3,072** | **22.6583** | `dataset_B_completo.csv` (examinados) |
+
+- De las seis claves del `SPEC` **solo cambian dos**: `ref_rendimiento` y `meta`.
+  El modelo, el preprocesamiento, los rangos de engagement, los pesos y los
+  umbrales quedan idénticos; el script aborta si detectara cualquier otra.
+- **El `.js` generado reproduce a sklearn con máx |Δ| = 2.842 × 10⁻¹⁴** sobre 300
+  filas (200 con perfil académico + 100 sin perfil, que ejercitan la imputación
+  por mediana/moda). Es la misma precisión que verificó el script 14.
+- El índice compuesto del `.js` contra el predictor Python difiere en 0.01 en 31
+  de las 300 filas: es **modo de redondeo**, no cálculo. Aplicando el criterio de
+  `Math.round()` a los valores sin redondear de Python la diferencia cae a cero,
+  y la categoría coincidió en las 300.
+- El diff contra el artefacto vigente es de 2 líneas quitadas y 6 puestas sobre
+  208 → 212. Los hashes SHA-256 de los 21 ficheros de `models/` y
+  `models/deploy/` no cambiaron.
+
+El efecto se ve en el propio artefacto: sobre el estudiante de demostración que
+el `.js` trae al final, `componente_rendimiento` pasa de 49.04 a 49.48 y el
+índice de 44.66 a 44.99, mientras el engagement —que no pasa por el percentil— se
+queda clavado en 31.53.
+
+**En una frase:** el arreglo que ya estaba hecho en los cálculos por fin llegó al
+archivo que se sube a la web, y se comprobó que sigue dando los mismos números
+que el modelo original.
+
+---
+
+# 13. ESTADO ACTUAL
+
+**Actualizado: 2026-09-02** · Pipeline al día hasta el **script 19**.
+
+Este bloque se reescribe cada vez que un script nuevo añade su sección arriba.
+Es la única parte de este documento que se actualiza en lugar de solo crecer.
+
+## Pendientes resueltos
+
+| # | Pendiente | Resuelto por | Cómo quedó |
+| --- | --- | --- | --- |
+| 1 | Saber si el R² bajo era un fallo o un hallazgo | Script 08 | Hallazgo: techo teórico ≈ 0.137 con las variables de entonces |
+| 2 | Añadir al formulario las 5 variables de perfil académico | Fundación + export de agosto | Recogidas; 1,148 de 3,072 examinados las declararon |
+| 3 | Separar el efecto «más datos» del efecto «mejores variables» | Scripts 11 y 12 | Ganan las variables: R² +0.098 → +0.180 con la muestra fija |
+| 4 | Saber **cuáles** variables pesan | Script 13 | `promedio_academico` domina (ΔR² +0.104), 2.7× la segunda |
+| 5 | Optimizar hiperparámetros y exportar el modelo v2 | Script 14 | Hold-out R² +0.1766, MAE 15.00; artefacto JS verificado |
+| 6 | Saber qué cambiaría al desplegar v2, sin tocar producción | Script 15 | Ejecución en sombra: casi nada cambia para los examinados |
+| 7 | Corregir la población de referencia del percentil | Script 17 | `ref_rendimiento` de 1,148 → 3,072 en el pipeline Python/CSV |
+| 8 | Puntuar a los inscritos que no presentaron el examen | Script 18 | 248 estudiantes en `outputs/ml_scores_sin_examen.csv` |
+| 9 | Propagar la referencia corregida al artefacto de despliegue | Script 19 | `potencial_stem_predictor_v2_corrected.js`, verificado a 1e-14 |
+| 10 | **Extender el `SELECT` de la Edge Function a las 5 variables de perfil** | **Repo web (fuera de este repo)** | **Hecho** — ver nota abajo |
+
+> **Sobre el punto 10 — no es un pendiente.** El `COLS_INSC` de la Edge Function
+> **ya se extendió** para leer `promedio_academico`,
+> `horas_estudio_matematicas`, `motivacion_participar`,
+> `clases_extra_matematicas` y `gusto_logica`. Ese cambio se hizo **en el repo
+> web (`Recursos Web/sapiencex`), fuera de este repositorio, trabajando en
+> Antigravity**, así que no aparece en el historial de `ml-models` ni en ningún
+> informe de `reports/`. Se deja escrito aquí para que **no se vuelva a listar
+> como pendiente**: informes anteriores de este repo (y `SESION_ACTUAL.md` en su
+> versión del 2026-09-02) lo daban por abierto porque `grep promedio_academico`
+> sobre `index.ts` no encontraba nada desde este lado.
+
+## Pendientes abiertos
+
+**Despliegue (bloquean el valor del modelo v2)**
+
+1. **Desplegar el artefacto corregido** y decidir su nombre definitivo: mantener
+   el sufijo `_corrected` o promoverlo a `potencial_stem_predictor_v2.js`. Es
+   decisión de operación, no de modelado; mientras tanto el fichero viejo sigue
+   en su sitio para revertir.
+2. **Subir `outputs/ml_scores_v2_corrected.csv` a una tabla NUEVA `ml_scores_v2`**
+   en Supabase. No sobrescribir `ml_scores`; volcarla a CSV antes de tocar nada.
+   `outputs/ml_scores_sin_examen.csv` va aparte, o con marca de población
+   explícita.
+3. **Añadir la columna `modelo_version` a `ml_scores`** antes de cualquier
+   despliegue híbrido: hoy no hay forma de saber qué modelo puntuó cada fila.
+4. **Decidir si `puntaje_estimado` deja de estar fijado a `null`.** Mientras siga
+   en `null`, desplegar v2 no cambia nada visible para quien ya presentó el
+   examen (§11.2). Si se activa, entra con las condiciones del punto 9 de abajo.
+
+**Producto y presentación**
+
+5. **Construir el dashboard académico** en el repo web.
+6. **Separar visualmente la población sin examen.** El techo aritmético de 83.33
+   (§12.2) hace que "Talento destacado" sea inalcanzable para ella; mostrarla
+   junto a los examinados sería engañoso. La marca `tiene_puntaje_real` no basta.
+
+**Método (abiertos por el script 18)**
+
+7. **Revisar la fórmula de resiliencia sin nota.** Cinco valores discretos entre
+   30 y 50 para un cuarto del índice es demasiado pobre, y es la mitad de la
+   causa del aplanamiento.
+8. **Buscar talento oculto en la población sin examen con otro método.** El
+   detector actual da 0 por construcción. Con `indice_condiciones` —que no
+   depende del puntaje— más el perfil de cluster se pueden priorizar los
+   estudiantes en condiciones adversas sin pasar por un modelo sin señal.
+9. **Política de `puntaje_estimado`:** nunca como cifra puntual, nunca en la
+   misma columna que un puntaje real, nunca para decisiones individuales, nunca
+   para rankear a la población sin examen (MAE ±15 sobre 0–100).
+10. **Declarar `ref_rendimiento` como decisión de producto**, no como subproducto
+    del dataset de entrenamiento de cada versión. Los scripts 17 y 19 existen
+    porque no lo estaba.
+11. **Re-validar (y quizá re-entrenar) con cada nueva cohorte.** El script 08
+    detectó *concept drift* leve: el R² no se transporta solo. El framework
+    `models/deploy/validation_framework.py` está para eso.
+
+**Datos**
+
+12. **Revisar si `inscripciones_emergencia` tiene inscritos sin resultado.** El
+    export del script 18 salió solo de `inscripciones_copa_stem`; si esa otra
+    tabla aporta, faltan estudiantes en los 248.
+13. **Tratar el seguimiento a los 248 como intervención de equidad**, no como
+    trámite administrativo: son desproporcionadamente los que peor están (§12.2).
+
+**Higiene del repositorio**
+
+14. **`.gitignore` está guardado en UTF-16**, así que git no lo interpreta y sus
+    patrones (`.venv/`, `*.joblib`, `__pycache__/`) no se aplican; por eso
+    aparecen `.pyc` y `.joblib` en `git status`. Detectado, no corregido.
+15. **El script 16 no tiene informe propio** en `reports/`. Su documentación vive
+    en la cabecera del script y en las figuras (§11.3).
+
+## Cómo queda el pipeline
+
+```
+Fase 1-3  (julio, 1,748-1,750 examinados)   scripts 01-07, 05b, 05c   → §4
+Fase 4    (julio, validación y contraste)   scripts 08-10             → §9
+Fase 5    (agosto, 3,072 examinados)        scripts 11-13             → §10
+          modelo v2 y evaluación en sombra  scripts 14-16             → §11
+          referencia corregida y despliegue scripts 17-19             → §12
+```
+
+---
+
+_Secciones 9 a 13 añadidas el 2026-09-02 a partir de `reports/08` … `reports/19`
+y de los ficheros de `outputs/`. Ninguna cifra de estas secciones es nueva: todas
+provienen de un informe o de un artefacto ya generado en este repositorio._
