@@ -1,0 +1,74 @@
+{
+  "generado": "2026-09-02T08:24:11",
+  "script": "notebooks/19_regenerar_deploy_v2.py",
+  "modelo": {
+    "joblib": "mejor_modelo_puntaje_v2.joblib",
+    "entrenado": "2026-08-30T00:25:48",
+    "dataset_entrenamiento": "dataset_C_perfil.csv",
+    "n_arboles": 200,
+    "n_features": 23,
+    "holdout": {
+      "r2": 0.17663952657605664,
+      "mae": 14.995819066080928,
+      "n_test": 230
+    },
+    "identico_al_embebido_en_js_vigente": true,
+    "preprocess_identico": true
+  },
+  "referencia": {
+    "antes": {
+      "artefacto": "potencial_stem_predictor_v2.js",
+      "n": 1148,
+      "sigma": 20.5332,
+      "cohorte": "dataset_C_perfil.csv (entrenamiento)"
+    },
+    "despues": {
+      "artefacto": "potencial_stem_predictor_v2_corrected.js",
+      "n": 3072,
+      "sigma": 22.6583,
+      "cohorte": "dataset_B_completo.csv",
+      "fuente": "outputs/F17_ref_rendimiento_corregido.json"
+    }
+  },
+  "spec_claves_que_cambian": [
+    "meta",
+    "ref_rendimiento"
+  ],
+  "verificacion": {
+    "n_muestra": 300,
+    "n_con_perfil": 200,
+    "n_sin_perfil": 100,
+    "max_delta_python_vs_sklearn": 2.842170943040401e-14,
+    "max_delta_js_vs_sklearn": 2.842170943040401e-14,
+    "max_delta_indice_js_vs_python": 0.010000000000001563,
+    "filas_con_delta_de_redondeo": 31,
+    "max_delta_indice_con_redondeo_js": 0.0,
+    "filas_identicas_en_los_4_componentes": 269,
+    "categorias_discrepantes": 0,
+    "node": "v24.13.0"
+  },
+  "artefactos": {
+    "nuevo": "models/deploy/potencial_stem_predictor_v2_corrected.js",
+    "bytes": 847905,
+    "diff_vs_vigente": {
+      "lineas_antes": 208,
+      "lineas_despues": 212,
+      "lineas_quitadas": 2,
+      "lineas_puestas": 6,
+      "quitadas": [
+        " * GENERADO por notebooks/14_optimizacion_hiperparametros.py — no editar a mano",
+        "const SPEC = {\"meta\": {\"generado\": \"2026-08-30T00:25:48\", \"n_cohorte\": 1148, \"m"
+      ],
+      "puestas": [
+        " * GENERADO por notebooks/19_regenerar_deploy_v2.py — no editar a mano.",
+        " * REFERENCIA CORREGIDA (script 17): `ref_rendimiento` percentiliza contra",
+        " * los 3,072 examinados de dataset_B_completo.csv, no contra los 1,148 del",
+        " * dataset de entrenamiento. El modelo y el preprocesamiento no cambian",
+        " * respecto a potencial_stem_predictor_v2.js.",
+        "const SPEC = {\"meta\": {\"generado\": \"2026-09-02T08:24:11\", \"generado_por\": \"note"
+      ]
+    },
+    "vigente_intacto": true,
+    "otros_ficheros_modificados": []
+  }
+}
