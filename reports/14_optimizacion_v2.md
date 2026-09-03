@@ -52,14 +52,26 @@ ciegos a la señal.
 
 | Modelo | Dataset | n | Features | R² | MAE |
 | --- | --- | --- | --- | --- | --- |
-| v1 — script 03 (producción actual) | cohorte original | 1,748 | 18 | ~0.241 * | ~16.4 * |
+| v1 — dentro de muestra (informes 09b y 10) — **no comparable** * | cohorte original | 1,748 | 18 | ~0.241 * | ~16.4 * |
 | v1 — hiperparámetros sobre C | `dataset_C_perfil` | 1,148 | 23 | +0.1625 | 15.06 |
 | **v2 — optimizado** | `dataset_C_perfil` | 1,148 | 23 | **+0.1766** | **15.00** |
 
 > **\* Las métricas de v1 en producción no son comparables** con las de v2.
-> Provienen de otro dataset, otra cohorte y otra partición (informe 03). La única
-> comparación limpia es la de las dos últimas filas: **misma partición, mismas
-> features, mismo dataset**, y ahí la diferencia es +0.0142 de R².
+> **Corrección de atribución (2026-09-03):** esta fila **no proviene del informe 03**
+> —que reporta 0.115 / 21.56 / 17.44 en test y 0.064 / 22.31 / 18.36 en CV—, sino de los
+> **informes 09b y 10**. Es una evaluación **dentro de muestra** sobre los 1,748
+> examinados, ~80 % de los cuales entrenaron ese mismo bosque; queda trazada y reproducida
+> en el informe 20 (R² = 0.2412, MAE = 16.4331 sobre `models/deploy/puntaje_estimado.csv`).
+> No es "otra partición": es **ninguna partición**.
+>
+> **Advertencia de lectura:** poner una cifra *dentro de muestra* en la misma tabla que el
+> *hold-out* de v2 **hace que v2 parezca artificialmente peor** — compara la nota que v1 se
+> puso con el examen a la vista contra la nota que v2 sacó a libro cerrado. La comparación
+> limpia entre ambos modelos es la del **informe 15**: MAE **18.45** (v1, fuera de muestra
+> sobre los 1,148 de C, solapamiento verificado = 0) frente a **15.00** (v2, hold-out), a
+> favor de v2 en 3.45 puntos. Dentro de esta tabla, la única comparación limpia sigue
+> siendo la de las dos últimas filas: **misma partición, mismas features, mismo dataset**,
+> y ahí la diferencia es +0.0142 de R².
 
 La comparación honesta contra el modelo desplegado hoy es imposible sin
 reevaluar v1 sobre esta misma partición, y aun entonces v1 no puede usar las 5

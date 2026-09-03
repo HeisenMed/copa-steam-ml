@@ -595,8 +595,8 @@ el estrato vuelve a ser no significativo (p = 0.739). Ver
 
 ## 4.2 Fase 2 — Modelo Predictivo del Puntaje (script 03)
 
-Se entrenaron 4 modelos con 18 features (one-hot incluido). Resultados sobre datos
-**limpios** (1.754 estudiantes):
+Se entrenaron 4 modelos con 18 features (one-hot incluido). Resultados sobre los datos
+**limpios** (**1.750 estudiantes**):
 
 | Modelo | R² (CV) | R² (test) | RMSE (test) | MAE (test) |
 |---|---|---|---|---|
@@ -604,6 +604,14 @@ Se entrenaron 4 modelos con 18 features (one-hot incluido). Resultados sobre dat
 | **Random Forest ⭐** | 0.064 | **0.115** | 21.56 | 17.44 |
 | XGBoost | −0.033 | 0.053 | 22.30 | 17.82 |
 | LightGBM | −0.124 | 0.013 | 22.77 | 18.15 |
+
+> **Conteos de esta cohorte (corregido el 2026-09-03).** La cadena real es **1.754 crudos
+> → 1.750 tras limpieza** (se descartan 4 registros de prueba; es la población que entrena
+> el script 03) **→ 1.748 tras deduplicar por documento**
+> (`drop_duplicates('numero_documento')` en el script 09b; es la población de los informes
+> 09, 10 y 14). Esta sección publicaba antes "datos **limpios** (1.754 estudiantes)": el
+> 1.754 es precisamente el conteo **crudo**, anterior a la limpieza. Trazabilidad en el
+> informe 20.
 
 Ver `../outputs/F03_comparacion_modelos.png`. La validación honesta out-of-fold
 (script 09b) confirma un **R² ≈ 0.084** (MAE 18.1), coherente con la CV: el punto
@@ -1650,3 +1658,91 @@ Ninguna cifra de esta sección es nueva: todas provienen de un informe o de un
 artefacto ya existente en este repositorio, salvo la reproducción de R² = 0.2412
 sobre `models/deploy/puntaje_estimado.csv`, que recalcula una métrica a partir de
 predicciones ya guardadas y no reentrena ningún modelo._
+
+---
+
+# 15. RECONCILIACIÓN APLICADA — LA MÉTRICA OFICIAL DE v1 QUEDA FIJADA
+
+## 15.1 De diagnóstico a corrección
+
+**La pregunta.** El §14 cerró con una lista de correcciones pendientes y una frase
+incómoda: *"el informe 20 es diagnóstico y **no editó nada**"*. Mientras esa lista
+siguiera abierta, el repositorio publicaba en su portada un R² que él mismo ya
+había demostrado que **no existe**, y colocaba en una tabla de comparación una
+cifra *dentro de muestra* junto a dos *hold-out*. Un lector externo —un evaluador
+de la Copa, por ejemplo— se llevaría de ahí una conclusión falsa sin ninguna forma
+de detectarlo. La pregunta ya no era *cuál es la cifra buena*, que eso lo resolvió
+el informe 20, sino **si el repositorio se corrige a sí mismo o deja el error
+publicado**.
+
+**Qué se hizo.** Se aplicaron las correcciones de prioridad alta del informe 20 y
+la de higiene del conteo de cohorte. **Solo documentación**: no se tocó ningún
+script, ningún modelo, ningún `.joblib`, ningún predictor JS ni ningún CSV o JSON
+de `outputs/`, y **no se reentrenó ni se regeneró nada**. Ninguna cifra correcta
+se modificó: las tres evaluaciones siguen publicadas con su valor exacto —0.115
+*hold-out*, 0.241 *dentro de muestra*, 0.084 *out-of-fold*—; lo que cambió es
+**qué etiqueta lleva cada una y a qué informe se atribuye**.
+
+## 15.2 La métrica oficial de v1
+
+**R² out-of-fold = 0.084** (MAE **18.1**, RMSE **22.1**), con IC 95 % por
+bootstrap de 1000 remuestreos **[0.053, 0.116]**, sobre los **1.748 estudiantes
+examinados**. Fuente: informes 08 y 09b.
+
+Es la oficial por cuatro razones, todas ya establecidas en el §14: es
+**out-of-fold** —cada predicción viene de un modelo que no vio a ese estudiante—;
+cubre a **los 1.748**, no a un test de ~350; es **la única con intervalo de
+confianza**, y ese intervalo no toca el cero (el poder predictivo es real) y
+**contiene al 0.115**; y es **coherente con todo lo demás** que este repositorio
+mide honestamente: 0.064 (CV, §4.2), 0.091 (CV, §4.4), 0.086 (dataset A, §10.2).
+Todo converge a **0.06–0.09**.
+
+**Por qué existen las otras dos cifras**, y por qué ninguna es la oficial:
+
+- **0.115 / MAE 17.44 (informe 03).** Es real y **se queda publicada tal cual**: es
+  el *hold-out* del 20 % de aquel script, un único split de **n ≈ 350**. No se
+  borra, porque es el resultado que ese script produjo. Pero con esa n un solo
+  split se mueve varios centésimos por azar, y el IC del 0.084 lo contiene: es el
+  **borde optimista del mismo fenómeno**, no un resultado distinto.
+- **~0.241 / MAE 16.4 (informes 09b y 10).** También es real, y se reprodujo dígito
+  a dígito —R² = 0.2412, MAE = 16.4331— sobre las 1.748 predicciones ya guardadas
+  en `models/deploy/puntaje_estimado.csv`. Es una evaluación **dentro de muestra**:
+  el ~80 % de esos estudiantes entrenaron el bosque que los está puntuando, así que
+  mide en buena parte memorización. **Legítima solo con su etiqueta puesta, y nunca
+  en la misma tabla que una métrica hold-out.**
+- **~0.238 / ~18 pts (README).** **No es real.** No procede de ninguna evaluación
+  documentada, no aparece en ningún informe, script, artefacto ni commit, y nunca
+  tuvo otro valor en la historia de git. **Se retiró, no se "ajustó"**: corregirla a
+  un decimal cercano habría sido fabricarle el respaldo que nunca tuvo.
+
+## 15.3 Las ediciones aplicadas
+
+| Fichero | Qué se cambió |
+|---|---|
+| `README.md` | La tabla *Estado del modelo* publicaba `~0.238 / ~18 pts` para v1. Se sustituye por **0.084 / 18.1 pts** y se añade una nota que declara explícitamente que es **out-of-fold sobre los 1.748 examinados**, con RMSE 22.1 e IC 95 % [0.053, 0.116]. |
+| `reports/10_modelo_teorico_vs_empirico.md` | Es el punto donde el ~0.241 **perdió su etiqueta** por primera vez, y desde donde se propagó. Se le devuelve: el resumen ejecutivo y la tabla comparativa marcan ahora esa fila como **dentro de muestra** sobre las 1.748 filas de `models/deploy/puntaje_estimado.csv`, no una estimación de generalización. **Las cifras no se tocaron.** |
+| `reports/14_optimizacion_v2.md` | Atribuía el ~0.241 / ~16.4 al **informe 03**, que no contiene esa cifra. Se corrige la atribución a los **informes 09b y 10**, se marca la fila como dentro de muestra y **no comparable** (conservando el asterisco) y se añade la advertencia de que colocar una cifra dentro de muestra junto al hold-out de v2 **hace que v2 parezca artificialmente peor**: la comparación limpia es la del informe 15, **MAE 18.45 (v1, fuera de muestra) vs 15.00 (v2, hold-out)**. |
+| Este documento, §4.2 | Llamaba "datos **limpios** (1.754 estudiantes)" a lo que es el conteo crudo. Se corrige a la cadena real: **1.754 crudos → 1.750 tras limpieza → 1.748 tras deduplicar por documento**. |
+| Este documento, §15 | Esta sección. |
+
+**Lo que deliberadamente NO se tocó.** Los informes **03, 08, 09b, 12, 15, 17, 18,
+19 y 20** quedan intactos: sus cifras son correctas para lo que cada uno declara
+medir. Tampoco se tocó ningún script, modelo ni artefacto. Del listado del informe
+20 siguen abiertas tres recomendaciones menores: anotar en el informe 03 el tamaño
+de su test (n ≈ 350), poner la etiqueta *dentro de muestra* también en la tabla del
+§9.3 de este documento, y **fijar las métricas dentro del artefacto de v1** como ya
+hace v2 con `metricas_holdout` — esta última exige ejecutar código, así que no
+cabía en una corrección solo documental.
+
+**La regla que queda.** Toda cifra de R² o MAE se publica con **tres datos
+inseparables**: valor, población (n) y partición (*in-sample* / CV / *out-of-fold*
+/ *hold-out*). Las tres cifras en disputa habrían sido imposibles bajo esa regla:
+no se contradecían entre sí, describían cosas distintas publicadas como si fueran
+la misma.
+
+---
+
+_Sección 15 añadida el 2026-09-03. Registra la **aplicación** de las correcciones
+diagnosticadas en `reports/20_reconciliacion_metricas_v1.md`. Ninguna cifra de esta
+sección es nueva, y ninguna de las ediciones tocó un script, un modelo o un
+artefacto de despliegue._
