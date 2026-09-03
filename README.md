@@ -97,10 +97,17 @@ Cada script es **autocontenido y reproducible** (`random_state=42`). Los gráfic
 
 | Modelo | R² | MAE | Uso en producción |
 |--------|----|-----|-------------------|
-| Random Forest (script 03) | ~0.238 | ~18 pts | `indice_potencial` (componente rendimiento) |
+| Random Forest (script 03) | **0.084** | **18.1 pts** | `indice_potencial` (componente rendimiento) |
 | XGBoost (script 06) | — | — | `es_talento_oculto` |
 | K-Means k=4 (script 07) | — | — | `cluster_nombre` |
 | Modelo teórico (script 10) | — | — | `indice_condiciones` (knowledge-driven) |
+
+> **El R² de v1 es out-of-fold sobre los 1.748 estudiantes examinados.** R² = **0.084**,
+> MAE **18.1**, RMSE **22.1**, con IC 95 % por bootstrap de 1000 remuestreos
+> **[0.053, 0.116]**: cada predicción la hizo un modelo entrenado sin ese estudiante
+> (5-fold `cross_val_predict`, informes 08 y 09b). Es la métrica oficial de v1 y
+> **sustituye a la fila `~0.238 / ~18 pts`** que esta tabla publicaba antes, que no tenía
+> ninguna fuente trazable en el repositorio (informe 20).
 
 > **`puntaje_estimado` está en NULL en producción.** La Edge Function lo fija a `null` de forma
 > explícita (`index.ts:153`). Es el cambio que activaría el valor del modelo v2 — y el más

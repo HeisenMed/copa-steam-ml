@@ -12,7 +12,7 @@ de SES), sin usar ningún resultado de Copa STEM. Se comparó con el modelo
 **empírico** (Random Forest, script 03) y con el puntaje **real** de los
 **1,748 estudiantes** que presentaron:
 
-- **Empírico vs real:** R² = 0.241, MAE = 16.4,
+- **Empírico vs real (evaluación DENTRO DE MUESTRA):** R² = 0.241, MAE = 16.4,
   r = 0.504.
 - **Teórico vs real:** R² = -0.202, MAE = 21.7,
   r = 0.191 (el índice mide *condiciones*, no la nota: su R²
@@ -20,6 +20,12 @@ de SES), sin usar ningún resultado de Copa STEM. Se comparó con el modelo
 - **Correlación teórico–empírico:** r = 0.466: ambos modelos
   apuntan en la misma dirección, evidencia de que los datos reflejan en buena
   medida los patrones esperados por la literatura.
+
+> **Etiqueta de las cifras del empírico.** El `R² = 0.241 / MAE = 16.4 / r = 0.504` es una
+> evaluación **dentro de muestra** sobre las **1,748 filas** de
+> `models/deploy/puntaje_estimado.csv` —el bosque puntuando a estudiantes que en su mayoría
+> usó para entrenarse—, **no una estimación de generalización**: la métrica honesta de v1 es
+> el R² out-of-fold = 0.084 (MAE 18.1, informes 08, 09b y 20).
 
 El índice permitió detectar **16 casos de alta sospecha**
 (resultado "demasiado bueno para el contexto" **y** examen en menos de 30
@@ -94,7 +100,7 @@ medio y sin herramientas obtiene
 
 | Modelo | R² vs real | MAE | r (Pearson) |
 | --- | --- | --- | --- |
-| Empírico (Random Forest) | 0.241 | 16.4 | 0.504 |
+| Empírico (Random Forest) — **dentro de muestra** | 0.241 | 16.4 | 0.504 |
 | Teórico (indice_condiciones) | -0.202 | 21.7 | 0.191 |
 
 **Interpretación.** El empírico gana en R² y MAE porque está *calibrado a la
