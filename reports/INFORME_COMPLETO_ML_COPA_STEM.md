@@ -1565,3 +1565,88 @@ Fase 5    (agosto, 3,072 examinados)        scripts 11-13             → §10
 _Secciones 9 a 13 añadidas el 2026-09-02 a partir de `reports/08` … `reports/19`
 y de los ficheros de `outputs/`. Ninguna cifra de estas secciones es nueva: todas
 provienen de un informe o de un artefacto ya generado en este repositorio._
+
+---
+
+# 14. AUDITORÍA DE CIFRAS — RECONCILIACIÓN DEL R² DE v1 (informe 20)
+
+## 14.1 Informe 20 — Tres R² para un solo bosque
+
+**La pregunta.** El §4.2 de este mismo documento publica que v1 alcanzó **R² =
+0.115** en test. El §11.1 resume el informe 14, cuya tabla de comparación v1 vs
+v2 declara para el mismo modelo **~0.241**. Y el README publica un tercero,
+**~0.238**. Un mismo bosque, entrenado una sola vez en julio, con tres notas
+distintas. ¿Cuál es la de verdad?
+
+**Qué se hizo.** Un barrido exhaustivo de `reports/`, `outputs/`, `models/`,
+`notebooks/`, `README.md` y `SESION_ACTUAL.md` en busca de toda ocurrencia de R²,
+MAE y RMSE; la inspección del contenido de los dos `.joblib`, del
+`modelo_coeficientes.json`, del bloque `meta` de los predictores JS y de los tres
+JSON de `outputs/`; el rastreo en la historia de git de las cifras sin respaldo
+documental; y **una única computación**: recalcular R² y MAE sobre las
+predicciones ya guardadas en `models/deploy/puntaje_estimado.csv`. No se
+reentrenó nada, no se regeneró ningún artefacto y no se editó ningún informe.
+
+**Qué se encontró.**
+
+- **Las tres cifras no son transcripciones de un mismo número: son tres
+  evaluaciones distintas del mismo bosque**, y dos de ellas son legítimas por
+  separado.
+- **El ~0.241 sí tiene origen, y se reprodujo exactamente**: R² = 0.2412,
+  MAE = 16.4331, RMSE = 20.1255, r = 0.5043 sobre las 1,748 predicciones
+  guardadas. Coincide dígito a dígito con los informes 09b y 10. Es una
+  evaluación **dentro de muestra**: el 80 % de esos estudiantes entrenaron el
+  bosque que los está puntuando.
+- **El informe 09b la etiquetó bien** ("Sobre los datos de entrenamiento"), pero
+  **la etiqueta se perdió en el camino**: el informe 10 la publica sin ella, y el
+  informe 14 la hereda y además la **atribuye al informe 03**, que no la
+  contiene. El informe 03 dice 0.115 / 21.56 / 17.44.
+- **El efecto de esa pérdida es que v2 aparenta ser peor que v1.** En la tabla
+  del informe 14, `~0.241` (dentro de muestra) queda junto a `+0.1766` (hold-out
+  de v2). Es comparar la nota con el examen a la vista contra la nota a libro
+  cerrado. La única comparación limpia del repositorio —el §11.2, MAE **18.45**
+  de v1 fuera de muestra frente a **15.00** de v2— dice lo contrario: v2 gana por
+  3.45 puntos.
+- **El ~0.238 del README no existe en ninguna parte.** No lo produce ninguna
+  evaluación documentada, no está en ningún artefacto y `git log -S` lo sitúa sin
+  cambios desde el commit que creó esa tabla. Es la única cifra del repositorio
+  sin fuente trazable.
+- **La métrica oficial defendible de v1 es el R² out-of-fold = 0.084** (MAE 18.1,
+  RMSE 22.1), con IC 95 % por bootstrap **[0.053, 0.116]**. Es out-of-fold, cubre
+  a los 1,748, es la única con intervalo, y ese intervalo **contiene al 0.115**:
+  el hold-out del informe 03 no es un resultado distinto, es el borde optimista
+  del mismo fenómeno. Todo lo demás converge ahí —0.064 (CV, §4.2), 0.091
+  (CV, §4.4), 0.086 (dataset A, §10.2)—; el 0.241 es el único que se sale, y se
+  sale porque no mide lo mismo.
+- **Tres tamaños para la misma cohorte de julio**, todos del mismo origen:
+  **1,754** crudos → **1,750** tras limpieza (informe 03) → **1,748** tras
+  deduplicar por documento (informe 09b). El §4.2 de este documento llama
+  "datos **limpios** (1.754 estudiantes)" a lo que es precisamente el conteo
+  *sucio*.
+
+**La causa estructural.** v1 **nunca guardó sus métricas en un artefacto**: su
+`.joblib` contiene el modelo y el preprocesador, ningún R². v2 sí las guarda
+(`metricas_holdout`), y por eso su 0.1766 aparece idéntico en cinco sitios
+—informe 14, JSON F14, JSON F19, README y `SESION_ACTUAL.md`— sin una sola
+divergencia. La lección es de ingeniería, no de estadística: **la métrica tiene
+que viajar dentro del artefacto, no en la memoria de quien redacta el informe
+siguiente.**
+
+**Qué queda pendiente.** El informe 20 es diagnóstico y **no editó nada**. Las
+correcciones que dejarían el repositorio consistente están listadas y priorizadas
+en `reports/20_reconciliacion_metricas_v1.md`: retirar el ~0.238 del README,
+reetiquetar o sustituir la fila de v1 en el informe 14 y corregir su atribución,
+poner la etiqueta "dentro de muestra" en el informe 10 y en el §9.3 de este
+documento, anotar en el informe 03 que su 0.115 es un único split de n ≈ 350, y
+corregir el 1.754 del §4.2. Ninguna toca un modelo ni un artefacto de despliegue.
+
+**En una frase:** el repositorio no se contradecía, se estaba citando a sí mismo
+sin decir de qué examen hablaba cada nota.
+
+---
+
+_Sección 14 añadida el 2026-09-03 a partir de `reports/20_reconciliacion_metricas_v1.md`.
+Ninguna cifra de esta sección es nueva: todas provienen de un informe o de un
+artefacto ya existente en este repositorio, salvo la reproducción de R² = 0.2412
+sobre `models/deploy/puntaje_estimado.csv`, que recalcula una métrica a partir de
+predicciones ya guardadas y no reentrena ningún modelo._
