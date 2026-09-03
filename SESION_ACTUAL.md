@@ -1,6 +1,6 @@
 # SESIÓN ACTUAL — Copa STEM 2026
 
-Fundación SapienceLab · Última actualización: 2026-09-02
+Fundación SapienceLab · Última actualización: 2026-09-03
 
 Este archivo se reescribe completo en cada actualización. No se acumula historial.
 
@@ -8,153 +8,180 @@ Este archivo se reescribe completo en cada actualización. No se acumula histori
 
 ## 1. Qué se hizo en este turno
 
-Se creó y se **corrió** el script 19, que regenera el artefacto de despliegue v2
-con la referencia corregida de 3,072. Era el pendiente número 1 y el que
-bloqueaba todo lo demás. Queda cerrado.
+El turno tuvo dos mitades: una **auditoría de cifras** dentro de este repo y una
+**puesta al día del estado real del proyecto**, que hasta ahora estaba repartido
+entre este repo, el repo web y Supabase sin que ningún documento lo juntara.
 
-El `.js` que consume la Edge Function llevaba embebida la referencia vieja de
-1,148 que el script 17 existió para eliminar. La corrección del 17 se había
-quedado en el lado Python/CSV y nunca llegó al artefacto: desplegarlo tal cual
-habría reintroducido el problema por la puerta de atrás. Ya no.
+### 1.1 Auditoría y reconciliación de las métricas de v1 (verificado aquí)
 
-No se sobrescribió el `.js` viejo. No se modificó ningún script numerado
-anterior, ningún `.joblib`, ningún otro artefacto de `models/deploy/`, ni
-Supabase, ni la Edge Function.
+**Script 20 — `reports/20_reconciliacion_metricas_v1.md`.** Circulaban tres R²
+distintos para el mismo bosque v1: 0.115 (informe 03), ~0.241 (informe 14) y
+~0.238 (README). El informe rastreó los tres. No eran errores de transcripción de
+un mismo número: son **tres evaluaciones metodológicamente distintas**, y una de
+ellas directamente no existe.
 
-### Artefactos
+* Cifra           * Qué es en realidad                                      * Veredicto
+* 0.084 / 18.1    * Out-of-fold sobre los 1,748, IC 95 % [0.053, 0.116]     * **MÉTRICA OFICIAL de v1**
+* 0.115 / 17.44   * Hold-out del 20 % del informe 03, un solo split n ≈ 350 * Válida, es el borde optimista
+* ~0.241 / ~16.4  * Dentro de muestra sobre los 1,748 (informes 09b y 10)   * Legítima solo con su etiqueta
+* ~0.238 / ~18    * No procede de ninguna evaluación documentada            * **Sin fuente. Retirada.**
 
-* Archivo                                             * Estado    * Detalle
-* notebooks/19_regenerar_deploy_v2.py                 * Terminado * Corrido y verificado
-* models/deploy/potencial_stem_predictor_v2_corrected.js * Nuevo   * 828 KB, ref n=3,072
-* outputs/F19_verificacion_deploy_v2.json             * Completo  * Traza de verificación
-* reports/19_regenerar_deploy_v2.md                   * Completo  * Con los números reales
-* models/deploy/potencial_stem_predictor_v2.js        * INTACTO   * Mismo hash, para rollback
+El ~0.241 se reprodujo dígito a dígito (R² = 0.2412, MAE = 16.4331) recalculando
+sobre `models/deploy/puntaje_estimado.csv`, sin reentrenar nada. El ~0.238 no
+aparece en ningún informe, script, artefacto ni commit de la historia.
 
-### La referencia: antes y después
+**Commit `a62581c` — correcciones documentales aplicadas.** Excepción autorizada a
+la regla de no tocar ficheros existentes: dejar publicada una cifra que el propio
+repo ya demostró falsa era peor que editarla.
 
-* Referencia          * n     * Media * σ       * Cohorte
-* Embebida hasta hoy  * 1,148 * 41.08 * 20.5332 * dataset_C_perfil.csv (entrenamiento)
-* Corregida           * 3,072 * 41.74 * 22.6583 * dataset_B_completo.csv (examinados)
+* Fichero                                     * Qué se corrigió
+* README.md                                   * Fila de v1: ~0.238/~18 → **0.084 / 18.1**, con nota OOF, RMSE 22.1 e IC
+* reports/10_modelo_teorico_vs_empirico.md    * Devuelta la etiqueta **dentro de muestra** (bullet + tabla). Cifras intactas
+* reports/14_optimizacion_v2.md               * Atribución corregida: no es del informe 03 sino de 09b y 10. Advertencia añadida
+* reports/INFORME_COMPLETO §4.2               * "1.754 limpios" → cadena real 1.754 crudos → 1.750 limpios → 1.748 deduplicados
+* reports/INFORME_COMPLETO §15                * Sección nueva que registra la reconciliación
 
-La corregida se tomó literalmente de `outputs/F17_ref_rendimiento_corregido.json`.
+No se tocó ningún script, modelo, `.joblib`, predictor JS ni artefacto de
+`outputs/`. Los informes 03, 08, 09b, 12, 15, 17, 18, 19 y 20 quedaron intactos.
 
-### Qué cambia dentro del `.js`
+La corrección del informe 14 importa más de lo que parece: su tabla ponía la cifra
+*dentro de muestra* de v1 junto al *hold-out* de v2, lo que **hacía parecer que v2
+empeoraba el modelo**. Es al revés — la comparación limpia es la del informe 15,
+MAE 18.45 (v1, fuera de muestra) vs 15.00 (v2, hold-out).
 
-De las 6 claves del `SPEC` solo cambian 2: `ref_rendimiento` y `meta`. El
-script aborta si detectara cualquier otra. Quedan idénticos `puntaje.model`
-(los 200 árboles), `puntaje.preprocess` (medianas, modas, one-hot),
-`engagement`, `pesos` y `categorias`.
+### 1.2 Trabajo hecho FUERA de este repo (reportado; esta sesión no puede verificarlo)
 
-El diff contra el artefacto vigente es de 2 líneas quitadas y 6 puestas sobre
-208 → 212: la línea de la constante `SPEC`, la línea `GENERADO por…` y cuatro
-comentarios que dejan escrito dentro del propio fichero que la referencia es la
-corregida. El resto del cuerpo JS queda byte a byte igual.
+Todo lo que sigue ocurrió en el repo web y en Supabase. Se registra **como
+reportado**, no como verificado desde aquí.
 
-### Verificación de precisión
+**Edge Function `calcular-ml-scores`:**
 
-Muestra de 300 filas: 200 con perfil académico (ruta v2 normal) + 100 sin perfil
-(ejercitan la imputación por mediana/moda), `random_state=42`. Las mismas filas
-normalizadas se le pasan a Python y a Node.
+- `COLS_INSC` ampliado para leer las 5 columnas de perfil académico. El pendiente
+  que decía "`grep promedio_academico` da cero" queda **RESUELTO**.
+- Predictor v2 cableado en `index.ts` con **fallback a v1**: enruta según
+  `promedio_academico != null` y escribe `modelo_version` (`'v2'` / `'v1_fallback'`).
+- Está **commiteado, pero NO verificado en runtime y NO desplegado**.
+  **Producción sigue calculando con v1 hoy.**
+- `potencial_stem_predictor_v2_corrected.js` copiado al repo web.
 
-* Comparación                                       * Máx \|Δ\|
-* Intérprete Python vs sklearn.predict              * 2.842e-14
-* `_predictPuntaje` del .js generado vs sklearn     * **2.842e-14**
-* Índice compuesto: .js vs predictor Python         * 1.00e-02
+**Supabase:**
 
-La segunda es la que importa: **misma precisión (~1e-14) que la verificación
-original del script 14**. Node v24.13.0, importando el fichero generado intacto
-y —en copia temporal con una línea `export`— a precisión completa.
+* Objeto                       * Estado
+* `ml_scores.modelo_version`   * Columna añadida
+* `ml_scores_backup_20260901`  * Tabla de respaldo creada
+* `ml_scores_v2`               * Creada y poblada con los 3,072 scores corregidos
+* `ml_scores_sin_examen`       * Creada y poblada con las 248 filas del script 18
+* Permisos                     * SELECT anon + política de lectura pública en las dos nuevas
 
-La diferencia de 0.01 en 31 de las 300 filas es **modo de redondeo, no cálculo**:
-Python `round()` redondea al par y `Math.round()` del JS la mitad hacia arriba.
-Aplicando el criterio del JS a los valores sin redondear de Python, la
-diferencia máxima cae a 0.000e+00 en las 300 filas. Las categorías coincidieron
-en las 300. Es preexistente y afecta igual al artefacto vigente; se anota, no se
-corrige, porque corregirla obligaría a tocar el cuerpo del JS.
+**Repo web:** pestaña **"Estudio ML"** construida en el Modo Monitor, con 8
+secciones que cubren el estudio completo. Sus conteos de categoría en vivo se
+contrastaron contra los informes 17 y 18 y **coincidieron exactamente** (5/5 y
+14/14).
 
-### Comprobación de procedencia
+### 1.3 Comprobaciones hechas en este turno (pendiente 8)
 
-Los árboles y el preprocesamiento extraídos de `mejor_modelo_puntaje_v2.joblib`
-se compararon bit a bit contra los embebidos en el `.js` vigente: ambos `True`.
-El `.js` viene de ese `.joblib`, así que regenerarlo desde ahí es legítimo.
+Ambas son de solo lectura y ambas dieron resultado **negativo**:
 
-### Que no se movió nada más
-
-SHA-256 de los 21 ficheros de `models/` y `models/deploy/` tomados antes y
-después: **ninguno cambió**. El único fichero nuevo en `models/deploy/` es el
-corregido. El viejo conserva hash y fecha (Aug 30 00:25).
-
-### El efecto, visible en el propio artefacto
-
-Ejecutando los dos ficheros con `node` sobre el estudiante de demostración que
-el `.js` trae al final:
-
-* Salida                   * Vigente (ref 1,148) * Corregido (ref 3,072)
-* indice_potencial         * 44.66               * 44.99
-* componente_rendimiento   * 49.04               * 49.48
-* componente_engagement    * 31.53               * 31.53
-* componente_resiliencia   * 49.04               * 49.48
-* categoria                * En desarrollo       * En desarrollo
-
-El engagement no se mueve —no pasa por el percentil— y el rendimiento sí. Es
-exactamente la firma del cambio que se buscaba.
+- **El `.gitignore` sigue en UTF-16.** No se aplicó la conversión: está en UTF-16
+  LE tanto en el árbol de trabajo como en HEAD. `git check-ignore` no devuelve
+  nada para `.venv`, `models/mejor_modelo_puntaje_v2.joblib` ni
+  `notebooks/__pycache__` — **ninguno de sus patrones está en vigor**.
+- **La búsqueda de CSV en la historia NO salió limpia.** Hay **5 CSV bajo `data/`
+  commiteados y presentes en HEAD**, y sus cabeceras incluyen `numero_documento`,
+  `nombres`, `apellidos` e `institucion_educativa`: son **datos identificables de
+  estudiantes menores de edad**. Ver pendiente 8, que sube de prioridad.
 
 ---
 
 ## 2. Dónde está cada cosa
 
-* Repo ML: `Copa STEAM/ml-models` (rama main, scripts 01-19)
-* Repo web: `Recursos Web/sapiencex` (repo git independiente, tiene `src/`, `supabase/`, `docs/sql/`)
-* Modelo v2: R2=0.1766, MAE=15.00, `models/mejor_modelo_puntaje_v2.joblib`
-* Desplegable v2 CORREGIDO: `models/deploy/potencial_stem_predictor_v2_corrected.js` (828 KB, ref n=3,072)
-* Desplegable v2 viejo: `models/deploy/potencial_stem_predictor_v2.js` (816 KB, ref n=1,148, NO desplegar)
-* Referencia corregida: `outputs/F17_ref_rendimiento_corregido.json` (n=3,072, σ=22.6583)
-* Traza de verificación: `outputs/F19_verificacion_deploy_v2.json`
+**Repos**
+
+* Repo ML  * `Copa STEAM/ml-models` (rama main, scripts 01-20)
+* Repo web * `Recursos Web/sapiencex` (repo git independiente: `src/`, `supabase/`, `docs/sql/`)
+
+**Modelos y métricas**
+
+* Modelo v1 (producción) * R² OOF = **0.084**, MAE 18.1, RMSE 22.1, IC 95 % [0.053, 0.116] * `models/mejor_modelo_puntaje.joblib`
+* Modelo v2 (listo)      * R² hold-out = **0.1766**, MAE **15.00** (n_test 230)             * `models/mejor_modelo_puntaje_v2.joblib`
+* v1 vs v2 limpio        * MAE **18.45** → **15.00** (informe 15, fuera de muestra)         * −3.45 pts, a favor de v2
+
+**Artefactos de despliegue**
+
+* Fichero                                                 * Estado
+* `models/deploy/potencial_stem_predictor_v2_corrected.js`* 828 KB, ref n=3,072 — **el bueno**, ya copiado al repo web
+* `models/deploy/potencial_stem_predictor_v2.js`          * 816 KB, ref n=1,148 — **NO desplegar**, se conserva para rollback
+* `models/deploy/potencial_stem_predictor.js`             * v1, es lo que corre en producción hoy
+* `outputs/F17_ref_rendimiento_corregido.json`            * Referencia corregida (n=3,072, media 41.74, σ=22.6583)
+* `outputs/F19_verificacion_deploy_v2.json`               * Traza de verificación del artefacto corregido
+
+**Estado del despliegue en una línea:** el código v2 con fallback está escrito y
+commiteado en el repo web, pero **producción sigue en v1**. Falta verificarlo en
+runtime y desplegarlo (pendiente 1).
+
+**Datos en Supabase**
+
+* Tabla                       * Contenido
+* `ml_scores`                 * Producción, calculada con v1; ya tiene `modelo_version`
+* `ml_scores_backup_20260901` * Respaldo previo a los cambios
+* `ml_scores_v2`              * 3,072 scores v2 con la referencia corregida
+* `ml_scores_sin_examen`      * 248 inscritos sin examen (script 18), población separada
 
 ---
 
 ## 3. Pendientes en orden
 
-1. Actualizar la Edge Function `index.ts` para que su `SELECT` lea
-   `promedio_academico`, `horas_estudio_matematicas`, `motivacion_participar`,
-   `clases_extra_matematicas` y `gusto_logica`. Hoy `grep promedio_academico`
-   sobre `index.ts` sigue dando cero. **Sin esto el v2 recibe las medianas del
-   SPEC en lugar de las respuestas reales y se comporta como un v1 caro**, así
-   que desplegar el artefacto corregido antes de este paso no aporta nada.
-2. Decidir el nombre del fichero en el despliegue: mantener el sufijo
+1. **Verificar el predictor v2 en runtime dentro de la Edge Function y desplegarlo.**
+   Bloqueado: `supabase functions serve` necesita Docker Desktop. Hasta que esto
+   pase, **producción sigue calculando con v1** y todo el trabajo de v2 está
+   escrito pero inactivo. Es el pendiente que desbloquea el valor de los demás.
+2. **Decidir el nombre del fichero en el despliegue:** mantener el sufijo
    `_corrected` o promoverlo a `potencial_stem_predictor_v2.js`. Es decisión de
    operación, no de modelado. Mientras tanto el viejo sigue ahí para revertir.
-3. Subir `ml_scores_v2_corrected.csv` a una tabla NUEVA `ml_scores_v2` en
-   Supabase. No sobrescribir `ml_scores`; volcarla a CSV antes de tocar nada.
-   `ml_scores_sin_examen.csv` va aparte o con marca de población explícita.
-4. Construir el dashboard académico en el repo web.
+3. **Actualizar la sección 1 del dashboard:** todavía publica **R² 0.115** para v1.
+   Debe pasar a la cifra oficial, **0.084 con su IC 95 % [0.053, 0.116]**,
+   declarando que es out-of-fold sobre los 1,748. La edición es del **repo web**;
+   este repo ya quedó corregido en el commit `a62581c`.
+4. **Revisar si `inscripciones_emergencia` tiene inscritos sin resultado de examen.**
+   El export de los 248 salió solo de `inscripciones_copa_stem`; si esa otra tabla
+   aporta, faltan personas en esa población.
+5. **Revisar la fórmula de resiliencia sin nota.** Cinco valores discretos entre 30
+   y 50 para un cuarto del índice es demasiado pobre, y es la mitad de la causa del
+   aplanamiento de la distribución sin examen.
+6. **Buscar talento oculto en el grupo sin examen con otro método.** El detector
+   actual no sirve ahí porque depende del puntaje. Con `indice_condiciones` (que no
+   lo usa) más el perfil de cluster se pueden priorizar los 53 en condiciones
+   adversas.
+7. **Construir la parte práctica del dashboard para docentes y secretarías:** la
+   lista de seguimiento de los 248, la lista de talento oculto y el simulador de
+   pesos. La pestaña "Estudio ML" ya cubre la parte explicativa; falta la
+   accionable. El seguimiento a los 248 es una **intervención de equidad**, no un
+   trámite administrativo.
+8. **Higiene del repositorio — comprobado este turno, y las dos partes fallan:**
+   - El `.gitignore` **sigue en UTF-16** y ninguno de sus patrones está en vigor.
+     Convertirlo a UTF-8. (El fichero aparece modificado en el árbol de trabajo
+     pero sin commitear y sin cambio de codificación.)
+   - Hay **5 CSV bajo `data/` en la historia y en HEAD** con `numero_documento`,
+     `nombres`, `apellidos` e `institucion_educativa` de estudiantes menores:
+     `copa_stem_dataset.csv`, `_completo`, `_limpio`, `_v3` y el snippet de
+     Supabase. **Esto es un asunto de datos personales, no de higiene**, y decidir
+     qué hacer (dejar de rastrearlos, reescribir historia, rotar el repo) es una
+     decisión que no se toma sola: requiere confirmación explícita antes de actuar.
 
-Pendientes heredados del script 18 (población sin examen):
+### Políticas vigentes (no son pendientes; son la regla)
 
-- **Decidir cómo se presenta la población sin examen en el dashboard.** El techo
-  de 83.33 obliga a separarla; mostrarla junto a los examinados sería engañoso.
-  La marca `tiene_puntaje_real` no basta: hay que separarlas visualmente.
-- **Revisar la fórmula de resiliencia sin nota.** Cinco valores discretos entre
-  30 y 50 para un cuarto del índice es demasiado pobre, y es la mitad de la
-  causa del aplanamiento.
-- **Buscar talento oculto en ese grupo con otro método.** El detector actual no
-  sirve ahí. Con `indice_condiciones` (que no depende del puntaje) más el perfil
-  de cluster se pueden priorizar los 53 en condiciones adversas.
-- **Tratar el seguimiento a los 248 como intervención de equidad**, no como
-  trámite administrativo.
-- **Revisar si `inscripciones_emergencia` tiene inscritos sin resultado.** El
-  export salió solo de `inscripciones_copa_stem`; si esa otra tabla aporta,
-  faltan en los 248.
-
-Pendientes menores heredados:
-
-- Añadir columna `modelo_version` a `ml_scores` antes de cualquier despliegue híbrido.
-- Política de `puntaje_estimado`: nunca como cifra puntual, nunca en la misma
-  columna que un puntaje real, nunca para decisiones individuales, nunca para
-  rankear a la población sin examen.
-- Tratar `ref_rendimiento` como decisión de producto declarada, no como
-  subproducto del dataset de entrenamiento de cada versión. El script 19 es la
-  consecuencia de que no lo estuviera.
-- El `.gitignore` está guardado en UTF-16, así que git no lo interpreta y sus
-  patrones (`.venv/`, `*.joblib`, `__pycache__/`) no se aplican. Por eso
-  aparecen `.pyc` y el `.joblib` en `git status`. Detectado, no tocado.
+- **`puntaje_estimado`:** nunca como cifra puntual, nunca en la misma columna que
+  un puntaje real, nunca para decisiones individuales, nunca para rankear a la
+  población sin examen.
+- **`ref_rendimiento`** es una decisión de producto declarada, no un subproducto
+  del dataset de entrenamiento de cada versión. El script 19 existió porque no lo
+  estaba siendo.
+- **Población sin examen separada siempre.** El techo de 83.33 obliga a
+  presentarla aparte; la marca `tiene_puntaje_real` no basta, la separación tiene
+  que ser visual.
+- **Toda cifra de R² o MAE se publica con tres datos inseparables:** valor,
+  población (n) y partición (in-sample / CV / out-of-fold / hold-out). Las tres
+  cifras en disputa del informe 20 habrían sido imposibles bajo esta regla.
+- **La métrica debe viajar dentro del artefacto.** v1 nunca guardó su R² en el
+  `.joblib` y por eso cada informe la recordó distinta; v2 sí lo hace
+  (`metricas_holdout`) y su 0.1766 aparece idéntico en cinco sitios.
