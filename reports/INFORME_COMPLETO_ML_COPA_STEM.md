@@ -29,7 +29,10 @@ statsmodels 0.14 · pandas 3.0 · `random_state=42`
 > relato —qué pregunta respondía ese paso, qué se hizo, qué se encontró— para que
 > el documento se pueda leer de principio a fin sin abrir nada más. Las secciones
 > anteriores **no se reescriben**: solo se añade al final, y el bloque
-> *Estado actual* se actualiza.
+> *Estado actual* se actualiza. **Al añadir una sección nueva hay que actualizar
+> también el *Índice* de arriba con su entrada correspondiente**: forma parte del
+> añadido, no es un paso opcional —§14 y §15 se anexaron sin hacerlo y el índice
+> quedó detenido en el punto 13 hasta el 2026-09-04—.
 
 ---
 
@@ -48,6 +51,8 @@ statsmodels 0.14 · pandas 3.0 · `random_state=42`
 11. [Fase 5 — El modelo v2 y su evaluación en sombra (scripts 14–16)](#11-fase-5--el-modelo-v2-y-su-evaluación-en-sombra-scripts-1416)
 12. [Fase 5 — La vara de medir y el cierre del ciclo (scripts 17–19)](#12-fase-5--la-vara-de-medir-y-el-cierre-del-ciclo-scripts-1719)
 13. [Estado actual](#13-estado-actual)
+14. [Auditoría de cifras — reconciliación del R² de v1 (informe 20)](#14-auditoría-de-cifras--reconciliación-del-r-de-v1-informe-20)
+15. [Reconciliación aplicada — la métrica oficial de v1 queda fijada](#15-reconciliación-aplicada--la-métrica-oficial-de-v1-queda-fijada)
 
 ---
 
@@ -1054,7 +1059,7 @@ grado, género ni institución, por estar potencialmente contaminados.
 
 | Modelo | R² vs real | MAE | r (Pearson) |
 | --- | --- | --- | --- |
-| Empírico (Random Forest) | 0.241 | 16.4 | 0.504 |
+| Empírico (Random Forest) — **dentro de muestra** | 0.241 | 16.4 | 0.504 |
 | Teórico (literatura) | −0.202 | 21.7 | 0.191 |
 
 El R² del teórico no es comparable en escala —mide *condiciones*, no la nota—,
@@ -1467,7 +1472,9 @@ que el modelo original.
 
 # 13. ESTADO ACTUAL
 
-**Actualizado: 2026-09-02** · Pipeline al día hasta el **script 19**.
+**Actualizado: 2026-09-04** · Pipeline al día hasta el **script 19**; documentación
+al día hasta el **informe 20**, cuyo diagnóstico y cuya corrección se añadieron el
+2026-09-03 como **§14** y **§15**.
 
 Este bloque se reescribe cada vez que un script nuevo añade su sección arriba.
 Es la única parte de este documento que se actualiza en lugar de solo crecer.
@@ -1486,6 +1493,7 @@ Es la única parte de este documento que se actualiza en lugar de solo crecer.
 | 8 | Puntuar a los inscritos que no presentaron el examen | Script 18 | 248 estudiantes en `outputs/ml_scores_sin_examen.csv` |
 | 9 | Propagar la referencia corregida al artefacto de despliegue | Script 19 | `potencial_stem_predictor_v2_corrected.js`, verificado a 1e-14 |
 | 10 | **Extender el `SELECT` de la Edge Function a las 5 variables de perfil** | **Repo web (fuera de este repo)** | **Hecho** — ver nota abajo |
+| 11 | **`.gitignore` guardado en UTF-16**, que impedía a git aplicar sus patrones | Commit `0acf87c` («repair .gitignore encoding») | Reescrito en texto ASCII; `.venv/`, `*.joblib` y `__pycache__/` vuelven a ignorarse |
 
 > **Sobre el punto 10 — no es un pendiente.** El `COLS_INSC` de la Edge Function
 > **ya se extendió** para leer `promedio_academico`,
@@ -1552,11 +1560,21 @@ Es la única parte de este documento que se actualiza en lugar de solo crecer.
 
 **Higiene del repositorio**
 
-14. **`.gitignore` está guardado en UTF-16**, así que git no lo interpreta y sus
-    patrones (`.venv/`, `*.joblib`, `__pycache__/`) no se aplican; por eso
-    aparecen `.pyc` y `.joblib` en `git status`. Detectado, no corregido.
-15. **El script 16 no tiene informe propio** en `reports/`. Su documentación vive
+14. **El script 16 no tiene informe propio** en `reports/`. Su documentación vive
     en la cabecera del script y en las figuras (§11.3).
+
+**Documentación (abiertos por el §15.3, al aplicar el informe 20)**
+
+15. **Anotar en el informe 03 el tamaño de su test (n ≈ 350).** Su R² 0.115 es un
+    único *hold-out* del 20 %; sin la n a la vista se lee como si fuera comparable
+    a una métrica *out-of-fold* sobre los 1.748 (§15.2).
+16. **Poner la etiqueta *dentro de muestra* en la tabla del §9.3**, que publica el
+    0.241 sin ella. Es el punto exacto donde la etiqueta se perdió y desde donde
+    se propagó (§14.1). *(Cerrado el 2026-09-04, en la misma pasada que añadió
+    este punto: la etiqueta ya está puesta en §9.3.)*
+17. **Fijar las métricas dentro del artefacto de v1**, como ya hace v2 con
+    `metricas_holdout`. Es el único de los tres que exige ejecutar código, así que
+    no cabía en una corrección solo documental (§14.1, «la causa estructural»).
 
 ## Cómo queda el pipeline
 
