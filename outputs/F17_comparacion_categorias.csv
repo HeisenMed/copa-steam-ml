@@ -1,0 +1,11 @@
+ambito,n_ambito,categoria,v1_ref_1750,v2_ref_1148_antes,v2_ref_3072_corregido,delta_corregido_vs_antes,delta_corregido_vs_v1
+cohorte_completa_3072,3072,Talento destacado,105,126,105,-21,0
+cohorte_completa_3072,3072,Alto potencial,699,715,721,6,22
+cohorte_completa_3072,3072,Promedio,1052,995,1006,11,-46
+cohorte_completa_3072,3072,En desarrollo,789,758,784,26,-5
+cohorte_completa_3072,3072,Requiere apoyo,427,478,456,-22,29
+subgrupo_v2_1148,1148,Talento destacado,30,51,28,-23,-2
+subgrupo_v2_1148,1148,Alto potencial,247,263,251,-12,4
+subgrupo_v2_1148,1148,Promedio,435,378,421,43,-14
+subgrupo_v2_1148,1148,En desarrollo,305,274,302,28,-3
+subgrupo_v2_1148,1148,Requiere apoyo,131,182,146,-36,15

@@ -4,3 +4,12 @@ __pycache__/
 .venv/
 *.joblib
 data/
+
+.claude/
+CLAUDE.md
+SESION_ACTUAL.md
+
+outputs/ml_scores_sin_examen.csv
+outputs/ml_scores_v2_corrected.csv
+
+.idea/
