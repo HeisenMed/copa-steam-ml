@@ -1494,6 +1494,7 @@ Es la única parte de este documento que se actualiza en lugar de solo crecer.
 | 9 | Propagar la referencia corregida al artefacto de despliegue | Script 19 | `potencial_stem_predictor_v2_corrected.js`, verificado a 1e-14 |
 | 10 | **Extender el `SELECT` de la Edge Function a las 5 variables de perfil** | **Repo web (fuera de este repo)** | **Hecho** — ver nota abajo |
 | 11 | **`.gitignore` guardado en UTF-16**, que impedía a git aplicar sus patrones | Commit `0acf87c` («repair .gitignore encoding») | Reescrito en texto ASCII; `.venv/`, `*.joblib` y `__pycache__/` vuelven a ignorarse |
+| 12 | **R² 0.241 en §9.3 publicado sin etiqueta** | Commit `44c8787` | Etiquetado como «dentro de muestra» en la tabla; ya no genera ambigüedad |
 
 > **Sobre el punto 10 — no es un pendiente.** El `COLS_INSC` de la Edge Function
 > **ya se extendió** para leer `promedio_academico`,
@@ -1568,11 +1569,7 @@ Es la única parte de este documento que se actualiza en lugar de solo crecer.
 15. **Anotar en el informe 03 el tamaño de su test (n ≈ 350).** Su R² 0.115 es un
     único *hold-out* del 20 %; sin la n a la vista se lee como si fuera comparable
     a una métrica *out-of-fold* sobre los 1.748 (§15.2).
-16. **Poner la etiqueta *dentro de muestra* en la tabla del §9.3**, que publica el
-    0.241 sin ella. Es el punto exacto donde la etiqueta se perdió y desde donde
-    se propagó (§14.1). *(Cerrado el 2026-09-04, en la misma pasada que añadió
-    este punto: la etiqueta ya está puesta en §9.3.)*
-17. **Fijar las métricas dentro del artefacto de v1**, como ya hace v2 con
+16. **Fijar las métricas dentro del artefacto de v1**, como ya hace v2 con
     `metricas_holdout`. Es el único de los tres que exige ejecutar código, así que
     no cabía en una corrección solo documental (§14.1, «la causa estructural»).
 
