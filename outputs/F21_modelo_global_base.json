@@ -1,0 +1,767 @@
+{
+  "script": "notebooks/21_modelo_global_base.py",
+  "generado": "2026-09-28T21:07:13",
+  "inventario": {
+    "fuente": "copa_stem_dataset_2026-08.csv.csv",
+    "pii_retirada_al_cargar": [
+      "institucion_educativa"
+    ],
+    "target_nulos": 0,
+    "porcentaje_igual_target": true,
+    "target_min_max": [
+      0.0,
+      100.0
+    ],
+    "crudo": {
+      "Bello": 747,
+      "Girardota": 1092,
+      "Copacabana": 1238
+    },
+    "prueba_retirados": {
+      "Bello": 0,
+      "Girardota": 0,
+      "Copacabana": 0
+    },
+    "dedup": {
+      "regla": "sesión completada: en cada documento duplicado se retira la fila con tiempo_usado_segundos > 10,800 (sesión no cerrada por el estudiante); la regla no usa el puntaje",
+      "columnas_de_sesion_disponibles": [
+        "tiempo_usado_segundos",
+        "cambios_pestana",
+        "intentos_copiar",
+        "intentos_pegar",
+        "intentos_click_derecho",
+        "created_at"
+      ],
+      "tiempo_filas_retiradas_s": [
+        4412089.0,
+        4601279.0,
+        4661685.0,
+        4703849.0,
+        4876349.0
+      ],
+      "puntaje_filas_retiradas": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        5.0
+      ],
+      "coincide_con_maximo_puntaje": true,
+      "documentos_duplicados": 5,
+      "filas_retiradas": 5,
+      "filas_retiradas_por_municipio": {
+        "Bello": 0,
+        "Girardota": 0,
+        "Copacabana": 5
+      },
+      "pares_donde_keep_first_elegiria_la_fila_menor": 3,
+      "sesiones_no_duplicadas_sobre_umbral_por_municipio": {
+        "Bello": 6,
+        "Girardota": 4,
+        "Copacabana": 4
+      }
+    },
+    "descartados": {
+      "documentos_en_lista": 22,
+      "excluidos_por_municipio": {
+        "Bello": 18,
+        "Girardota": 4,
+        "Copacabana": 0
+      },
+      "excluidos_total": 22,
+      "excluidos_con_perfil_por_municipio": {
+        "Bello": 18,
+        "Girardota": 2,
+        "Copacabana": 0
+      },
+      "excluidos_sin_perfil_por_municipio": {
+        "Bello": 0,
+        "Girardota": 2,
+        "Copacabana": 0
+      },
+      "documentos_de_la_lista_sin_fila_puntuada": 0,
+      "tasa_por_municipio": {
+        "Bello": 0.024096385542168676,
+        "Girardota": 0.003663003663003663,
+        "Copacabana": 0.0
+      }
+    },
+    "final": {
+      "Bello": {
+        "total": 729,
+        "con_perfil": 716,
+        "sin_perfil": 13
+      },
+      "Girardota": {
+        "total": 1088,
+        "con_perfil": 412,
+        "sin_perfil": 676
+      },
+      "Copacabana": {
+        "total": 1233,
+        "con_perfil": 0,
+        "sin_perfil": 1233
+      }
+    },
+    "final_total": 3050,
+    "discrepancias_vs_supabase": {
+      "Bello": {
+        "total": 0,
+        "con_perfil": 0,
+        "sin_perfil": 0
+      },
+      "Girardota": {
+        "total": 0,
+        "con_perfil": 0,
+        "sin_perfil": 0
+      },
+      "Copacabana": {
+        "total": 0,
+        "con_perfil": 0,
+        "sin_perfil": 0
+      }
+    },
+    "medias_crudas": {
+      "Bello": {
+        "todos": {
+          "media": 43.26474622770919,
+          "n": 729
+        },
+        "con_perfil": {
+          "media": 43.31703910614525,
+          "n": 716
+        },
+        "sin_perfil": {
+          "media": 40.38461538461539,
+          "n": 13
+        }
+      },
+      "Girardota": {
+        "todos": {
+          "media": 42.8079044117647,
+          "n": 1088
+        },
+        "con_perfil": {
+          "media": 35.50970873786408,
+          "n": 412
+        },
+        "sin_perfil": {
+          "media": 47.255917159763314,
+          "n": 676
+        }
+      },
+      "Copacabana": {
+        "todos": {
+          "media": 39.39983779399838,
+          "n": 1233
+        },
+        "con_perfil": {
+          "media": null,
+          "n": 0
+        },
+        "sin_perfil": {
+          "media": 39.39983779399838,
+          "n": 1233
+        }
+      }
+    },
+    "brecha_seleccion_girardota": 11.746208421899233
+  },
+  "modelo": {
+    "modelo": "RandomForestRegressor",
+    "hiperparametros": {
+      "n_estimators": 300,
+      "max_depth": 10,
+      "min_samples_leaf": 8,
+      "random_state": 42
+    },
+    "predictores": {
+      "numericas": [
+        "grado_escolar",
+        "estrato",
+        "interes_prog_robotica",
+        "n_herramientas",
+        "n_areas_interes",
+        "nivel_programacion_ord",
+        "nivel_robotica_ord"
+      ],
+      "binarias": [
+        "computador_bin",
+        "internet_bin",
+        "olimpiadas_bin"
+      ],
+      "onehot": [
+        "genero",
+        "municipio",
+        "tipo_institucion"
+      ]
+    }
+  },
+  "metricas": {
+    "oof": {
+      "r2": 0.05150444458606773,
+      "mae": 17.848829920717893,
+      "rmse": 21.90784355792917,
+      "n": 3050,
+      "r2_ic95_bootstrap": [
+        0.028465304548376275,
+        0.0731171023122894
+      ],
+      "particion": "out-of-fold KFold(5, shuffle, random_state=42) sobre las 3,050 filas"
+    },
+    "holdout": {
+      "r2": 0.030539888532548964,
+      "mae": 17.66495117762144,
+      "rmse": 21.819328037006137,
+      "n": 610,
+      "n_train": 2440,
+      "particion": "hold-out 20 % estratificado por quintil de puntaje (random_state=42); entrenado con el 80 % restante",
+      "n_por_municipio": {
+        "Bello": 149,
+        "Girardota": 209,
+        "Copacabana": 252
+      }
+    },
+    "oof_por_grupo": {
+      "Bello": {
+        "r2": 0.07978383182328719,
+        "mae": 15.55869482983377,
+        "rmse": 19.02469312801219,
+        "n": 729
+      },
+      "Girardota": {
+        "r2": 0.05689236552712229,
+        "mae": 18.908502419889523,
+        "rmse": 23.251606181448874,
+        "n": 1088
+      },
+      "Copacabana": {
+        "r2": 0.01855140550401846,
+        "mae": 18.267795696999958,
+        "rmse": 22.275131196050683,
+        "n": 1233
+      },
+      "con_perfil": {
+        "r2": 0.04551555509773797,
+        "mae": 16.11886250103031,
+        "rmse": 19.65139973229347,
+        "n": 1128
+      },
+      "sin_perfil": {
+        "r2": 0.05221890367271009,
+        "mae": 18.864128177433606,
+        "rmse": 23.129845169967005,
+        "n": 1922
+      }
+    },
+    "poblacion_entrenamiento": "3,050 estudiantes de Bello, Girardota y Copacabana (export copa_stem_dataset_2026-08.csv.csv, deduplicado, sin descartados)",
+    "sd_target": {
+      "v1_1748": {
+        "sd": 23.103741334368518,
+        "n": 1748,
+        "fuente": "models/deploy/puntaje_estimado.csv"
+      },
+      "A": {
+        "sd": 24.22449211002552,
+        "n": 1735,
+        "fuente": "data/dataset_A_baseline.csv"
+      },
+      "B": {
+        "sd": 22.65829698223693,
+        "n": 3072,
+        "fuente": "data/dataset_B_completo.csv"
+      },
+      "global_3050": {
+        "sd": 22.49479195600125,
+        "n": 3050,
+        "fuente": "conjunto de este script"
+      }
+    },
+    "comparacion_v1": {
+      "v1": {
+        "r2_oof": 0.084,
+        "mae": 18.1,
+        "rmse": 22.1,
+        "r2_ic95": [
+          0.053,
+          0.116
+        ],
+        "n": 1748,
+        "poblacion": "1,748 estudiantes de Copacabana y Girardota",
+        "particion": "out-of-fold KFold(5)"
+      },
+      "este_modelo": {
+        "r2_oof": 0.05150444458606773,
+        "mae": 17.848829920717893,
+        "rmse": 21.90784355792917,
+        "r2_ic95": [
+          0.028465304548376275,
+          0.0731171023122894
+        ],
+        "n": 3050,
+        "poblacion": "3,050 estudiantes de Bello, Girardota y Copacabana (export copa_stem_dataset_2026-08.csv.csv, deduplicado, sin descartados)",
+        "particion": "out-of-fold KFold(5)"
+      },
+      "nota": "poblaciones distintas: v1 1,748 estudiantes de dos municipios; este modelo tres municipios. El MAE depende de la dispersión del target de cada población."
+    }
+  },
+  "importancia_permutacion_holdout": [
+    {
+      "variable": "grado_escolar",
+      "delta_r2": 0.04429365501963638,
+      "std": 0.01256715103252636
+    },
+    {
+      "variable": "n_areas_interes",
+      "delta_r2": 0.028977015191228743,
+      "std": 0.014770077013277316
+    },
+    {
+      "variable": "olimpiadas_bin",
+      "delta_r2": 0.017372125173606295,
+      "std": 0.007575403743312336
+    },
+    {
+      "variable": "n_herramientas",
+      "delta_r2": 0.01734468555005837,
+      "std": 0.007876346138360798
+    },
+    {
+      "variable": "interes_prog_robotica",
+      "delta_r2": 0.014079209312292557,
+      "std": 0.00969861571594216
+    },
+    {
+      "variable": "municipio",
+      "delta_r2": 0.002903257288104516,
+      "std": 0.009164187034645483
+    },
+    {
+      "variable": "nivel_programacion_ord",
+      "delta_r2": 0.0026228116080504182,
+      "std": 0.005138932393041851
+    },
+    {
+      "variable": "internet_bin",
+      "delta_r2": -0.00026195144328323706,
+      "std": 0.0005142463001215066
+    },
+    {
+      "variable": "computador_bin",
+      "delta_r2": -0.00039791712181935226,
+      "std": 0.004546939032621979
+    },
+    {
+      "variable": "tipo_institucion",
+      "delta_r2": -0.00041404111792520126,
+      "std": 0.006922633513613698
+    },
+    {
+      "variable": "nivel_robotica_ord",
+      "delta_r2": -0.0009508233821773126,
+      "std": 0.001958698028344598
+    },
+    {
+      "variable": "genero",
+      "delta_r2": -0.0011701891406386445,
+      "std": 0.007087139041440398
+    },
+    {
+      "variable": "estrato",
+      "delta_r2": -0.0031589864846459426,
+      "std": 0.004349920123249522
+    }
+  ],
+  "efecto_municipio": {
+    "residuo_medio_oof": {
+      "Bello": {
+        "media": -0.17372579181081182,
+        "n": 729
+      },
+      "Girardota": {
+        "media": 0.11426429142935955,
+        "n": 1088
+      },
+      "Copacabana": {
+        "media": -0.22995653589747575,
+        "n": 1233
+      }
+    },
+    "dependencia_parcial": {
+      "Bello": {
+        "media": 41.73585653008021,
+        "n": 3050
+      },
+      "Girardota": {
+        "media": 42.30484702872675,
+        "n": 3050
+      },
+      "Copacabana": {
+        "media": 40.55685967566626,
+        "n": 3050
+      }
+    },
+    "dependencia_parcial_sin_perfil": {
+      "Bello": {
+        "media": 41.33104004428075,
+        "n": 1922
+      },
+      "Girardota": {
+        "media": 41.78671332854399,
+        "n": 1922
+      },
+      "Copacabana": {
+        "media": 40.28397336939932,
+        "n": 1922
+      }
+    },
+    "orden_aprendido": [
+      "Girardota",
+      "Bello",
+      "Copacabana"
+    ],
+    "copacabana_menor_que_girardota": {
+      "modelo_dependencia_parcial": true,
+      "diferencia_modelo": -1.7479873530604877,
+      "medias_crudas_sin_perfil": true,
+      "diferencia_cruda_sin_perfil": -7.856079365764934
+    },
+    "coincide_con_medias_crudas": true
+  },
+  "limitaciones_v2": {
+    "dataset": "dataset_C_perfil.csv",
+    "n_entrenamiento_v2": 1148,
+    "descartados_incluidos": 20,
+    "descartados_incluidos_por_municipio": {
+      "Bello": 18,
+      "Girardota": 2,
+      "Copacabana": 0
+    },
+    "n_sin_descartados": 1128,
+    "columna_sospechoso_descartado_en_export": false,
+    "filtros_aplicados_por_scripts_11_y_14": [
+      "documentos de prueba",
+      "duplicados por documento (keep='first')",
+      "puntaje no nulo"
+    ]
+  },
+  "complementos": {
+    "1_dispersion_target": {
+      "sd": {
+        "v1_1748": {
+          "sd": 23.103741334368518,
+          "n": 1748,
+          "fuente": "models/deploy/puntaje_estimado.csv"
+        },
+        "A": {
+          "sd": 24.22449211002552,
+          "n": 1735,
+          "fuente": "data/dataset_A_baseline.csv"
+        },
+        "B": {
+          "sd": 22.65829698223693,
+          "n": 3072,
+          "fuente": "data/dataset_B_completo.csv"
+        },
+        "global_3050": {
+          "sd": 22.49479195600125,
+          "n": 3050,
+          "fuente": "conjunto de este script"
+        }
+      },
+      "cv_A": {
+        "r2_media_folds": 0.08605231405962996,
+        "r2_oof_agregado": 0.08945741652779649,
+        "rmse_oof": 23.0374964295071,
+        "sd_train": 24.14266177802089,
+        "n_train": 1388,
+        "particion": "KFold(5) sobre el train del 80 % (protocolo del script 12)"
+      },
+      "cv_B": {
+        "r2_media_folds": 0.05255917551435692,
+        "r2_oof_agregado": 0.05995855846315279,
+        "rmse_oof": 22.09024913607878,
+        "sd_train": 22.783850066784776,
+        "n_train": 2457,
+        "particion": "KFold(5) sobre el train del 80 % (protocolo del script 12)"
+      },
+      "descomposicion_A_B": {
+        "caida_r2": 0.029498858064643696,
+        "r2_B_si_rmse_de_A": -0.022389389828170625,
+        "parte_por_varianza": 0.11184680635596711,
+        "parte_por_error": -0.08234794829132341,
+        "rmse_A": 23.0374964295071,
+        "rmse_B": 22.09024913607878
+      },
+      "v1_vs_global": {
+        "sd_v1_implicita_por_identidad": 23.091095468953654,
+        "r2_global_si_sd_de_v1": 0.10084485275358812,
+        "caida_r2": 0.03249555541393227
+      }
+    },
+    "2_sensibilidad_sesiones_largas": {
+      "n_largas": 14,
+      "largas_por_municipio": {
+        "Bello": 6,
+        "Girardota": 4,
+        "Copacabana": 4
+      },
+      "puntajes_largas": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        10.0,
+        15.0,
+        15.0,
+        20.0,
+        25.0,
+        35.0
+      ],
+      "con": {
+        "oof": {
+          "r2": 0.05150444458606773,
+          "mae": 17.848829920717893,
+          "rmse": 21.90784355792917,
+          "n": 3050,
+          "particion": "out-of-fold KFold(5, shuffle, random_state=42) sobre 3,050 filas"
+        },
+        "dependencia_parcial": {
+          "Bello": 41.73585653008021,
+          "Girardota": 42.30484702872675,
+          "Copacabana": 40.55685967566626
+        },
+        "n_dp": 3050
+      },
+      "sin": {
+        "oof": {
+          "r2": 0.04996884359608722,
+          "mae": 17.800223437057454,
+          "rmse": 21.854282034647937,
+          "n": 3036,
+          "particion": "out-of-fold KFold(5, shuffle, random_state=42) sobre 3,036 filas"
+        },
+        "dependencia_parcial": {
+          "Bello": 42.06970576173002,
+          "Girardota": 42.390572295298284,
+          "Copacabana": 40.71916708218991
+        },
+        "n_dp": 3036
+      }
+    },
+    "3_reconciliacion_importancia_municipio": {
+      "ventana_A": [
+        "2026-05-22 16:39:02.431719+00:00",
+        "2026-06-05 16:03:51.505891+00:00"
+      ],
+      "ventanas_por_municipio": {
+        "Bello": [
+          "2026-07-09 15:33:10.214512+00:00",
+          "2026-07-30 11:55:59.851886+00:00"
+        ],
+        "Girardota": [
+          "2026-05-25 19:50:04.685980+00:00",
+          "2026-07-24 18:15:56.052682+00:00"
+        ],
+        "Copacabana": [
+          "2026-05-22 16:39:02.431719+00:00",
+          "2026-06-10 15:19:12.769776+00:00"
+        ]
+      },
+      "escenarios": [
+        {
+          "municipio": {
+            "delta_r2": 0.0808913090194974,
+            "std": 0.021436019672716865
+          },
+          "n_filas": 1735,
+          "n_test": 347,
+          "escenario": "A (réplica F13)"
+        },
+        {
+          "municipio": {
+            "delta_r2": 0.01654794229049354,
+            "std": 0.007186470937378555
+          },
+          "n_filas": 3072,
+          "n_test": 615,
+          "escenario": "B completo (3,072)"
+        },
+        {
+          "municipio": {
+            "delta_r2": 0.00246051196787113,
+            "std": 0.008855424692941493
+          },
+          "n_filas": 3050,
+          "n_test": 610,
+          "escenario": "global 3,050"
+        },
+        {
+          "municipio": {
+            "delta_r2": 0.04136336155216404,
+            "std": 0.014638869945649965
+          },
+          "n_filas": 3050,
+          "n_test": 610,
+          "mes_inscripcion": {
+            "delta_r2": 0.07977243199210332,
+            "std": 0.01960542690335203
+          },
+          "escenario": "global 3,050 + mes"
+        },
+        {
+          "municipio": {
+            "delta_r2": 0.013428027171809638,
+            "std": 0.007710240809494172
+          },
+          "n_filas": 3050,
+          "n_test": 610,
+          "dias_desde_inicio": {
+            "delta_r2": 0.1477709217469885,
+            "std": 0.022574754092858477
+          },
+          "escenario": "global 3,050 + días"
+        },
+        {
+          "municipio": {
+            "delta_r2": 4.066321416792048e-06,
+            "std": 0.007248398686803826
+          },
+          "n_filas": 2321,
+          "n_test": 465,
+          "escenario": "Copa+Girardota, todos los meses"
+        },
+        {
+          "municipio": {
+            "delta_r2": 0.09971666395929148,
+            "std": 0.025351529082305906
+          },
+          "n_filas": 2321,
+          "n_test": 465,
+          "mes_inscripcion": {
+            "delta_r2": 0.16357508432142623,
+            "std": 0.022099199290276553
+          },
+          "escenario": "Copa+Girardota + mes"
+        },
+        {
+          "municipio": {
+            "delta_r2": 0.06285904585164435,
+            "std": 0.018955721654159947
+          },
+          "n_filas": 1733,
+          "n_test": 347,
+          "escenario": "Copa+Girardota, ventana de A"
+        }
+      ],
+      "media_por_mes": {
+        "Bello|2026-07": {
+          "n": 729,
+          "media": 43.26474622770919
+        },
+        "Copacabana|2026-05": {
+          "n": 943,
+          "media": 40.084835630965
+        },
+        "Copacabana|2026-06": {
+          "n": 290,
+          "media": 37.172413793103445
+        },
+        "Girardota|2026-05": {
+          "n": 350,
+          "media": 54.57142857142857
+        },
+        "Girardota|2026-06": {
+          "n": 309,
+          "media": 40.16181229773463
+        },
+        "Girardota|2026-07": {
+          "n": 429,
+          "media": 35.116550116550115
+        }
+      },
+      "perfil_por_mes_girardota": {
+        "2026-05": {
+          "con_perfil": 0,
+          "sin_perfil": 350
+        },
+        "2026-06": {
+          "con_perfil": 0,
+          "sin_perfil": 309
+        },
+        "2026-07": {
+          "con_perfil": 412,
+          "sin_perfil": 17
+        }
+      },
+      "girardota_intra_institucion": {
+        "instituciones": 9,
+        "instituciones_en_mas_de_un_mes": 4,
+        "filas_en_esas_instituciones": 575,
+        "media_cruda_por_mes": {
+          "2026-05": {
+            "n": 274,
+            "media": 51.86131386861314
+          },
+          "2026-06": {
+            "n": 221,
+            "media": 37.44343891402715
+          },
+          "2026-07": {
+            "n": 80,
+            "media": 38.875
+          }
+        },
+        "desviacion_media_intra_por_mes": {
+          "2026-05": 0.23640283554509453,
+          "2026-06": -0.32061225653052167,
+          "2026-07": 0.07601164692361798
+        }
+      },
+      "girardota_perfil_intra_institucion": {
+        "instituciones_con_ambos": 4,
+        "filas": 760,
+        "media_cruda": {
+          "sin_perfil": 48.99449035812672,
+          "con_perfil": 35.45340050377834
+        },
+        "desviacion_media_intra": {
+          "sin_perfil": -0.5952906694308637,
+          "con_perfil": 0.5443085969859042
+        }
+      },
+      "telemetria_con_eventos_por_mes": {
+        "Bello|2026-07": 0.25377229080932784,
+        "Copacabana|2026-05": 0.10604453870625663,
+        "Copacabana|2026-06": 0.3103448275862069,
+        "Girardota|2026-05": 0.0,
+        "Girardota|2026-06": 0.14563106796116504,
+        "Girardota|2026-07": 0.23076923076923078
+      },
+      "dp_con_mes": {
+        "oof": {
+          "r2": 0.10190950606365179,
+          "mae": 17.3396431691535,
+          "rmse": 21.31778268602309,
+          "n": 3050,
+          "particion": "out-of-fold KFold(5, shuffle, random_state=42) sobre 3,050 filas"
+        },
+        "dependencia_parcial": {
+          "Bello": 43.38621304076529,
+          "Girardota": 43.96693640727198,
+          "Copacabana": 39.76785174788715
+        },
+        "n_dp": 3050
+      }
+    }
+  },
+  "entorno": {
+    "sklearn": "1.9.0",
+    "pandas": "3.0.3",
+    "numpy": "2.5.0"
+  }
+}
