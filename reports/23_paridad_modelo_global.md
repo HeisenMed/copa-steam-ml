@@ -17,12 +17,15 @@ Fecha: 2026-09-28 · `random_state = 42`
 - **Exportación:** se reutilizaron los exportadores del script 19, sin escribir ningún serializador nuevo. SPEC JSON de **1,120,939 B** y JS de **1,356,087 B**; 150 árboles y 44,734 nodos.
 - **API:** el scorer (`scorer.py`) es genérico. `schemas.py` y `config.py` dan por hechas cosas de v2; son cambios de la API, que se gestionan en su propio repo (§3).
 - **Paridad (artefactos de 150 árboles):** el scorer de la API, con la semántica de su runtime de producción (Python 3.11), frente al JS: **0 discrepancias en 12,546 comparaciones**, y el puntaje crudo es bit a bit idéntico en 2,091 de 2,091 cargas. Con Python ≥ 3.12 aparecerían 7 diferencias de 0.01, sin cambio de categoría. Es una **fragilidad latente** de `scorer.py` (§5).
-- **Veredicto:** los dos artefactos son coherentes entre sí, pero **no se declaran listos para desplegarse** hasta que la API reciba los cambios de §3.2 (§7).
+- **Veredicto:** los dos artefactos son coherentes entre sí, y los cambios de la API están aplicados y verificados en local. Falta fusionar el pull request y medir el arranque en frío antes de desplegar (§7).
 - **Decisiones declaradas sobre la cohorte publicada:**
   - Se aprueba la referencia de 3,050 y la corrección de los 3 duplicados.
   - **No** se aprueba repuntuarla con el SPEC global.
   - Se generó el archivo corregido: **3,320 filas, 25 cambios de categoría, todos hacia arriba**. **Se verificó que el reentrenamiento a 150 no lo afecta** (§8).
-- **Decisión declarada sobre las listas:** `herramientas_conocidas` y `areas_interes` pasan a ser obligatorias (§5.3).
+- **Listas:** `herramientas_conocidas` y `areas_interes` siguen siendo **opcionales** en la API. Una lista omitida se imputa con la mediana y `[]` cuenta 0 (§5.3).
+- **API actualizada** (sin commit, pendiente de PR; §3.3):
+  - Usa el SPEC nuevo, acepta estudiantes sin `promedio_academico`, y sus métricas y descripción corresponden al modelo global.
+  - `/clustering` y `/talento-oculto` responden **422**, nunca 500, cuando falta `promedio_academico`.
 - **Decisión institucional abierta:** qué hacer con el índice publicado de los 22 resultados descartados por sospecha (§8.3).
 
 ---
@@ -118,13 +121,47 @@ Se leyeron, solo en lectura, `app/models/scorer.py`, `app/schemas.py`, `app/mode
 
 `version_modelo()` devuelve `global_base`. Las claves de `meta` que usa `verificar_spec()` están presentes.
 
-### 3.2 Qué necesita cada archivo de la API y por qué
+### 3.2 Qué necesitaba cada archivo de la API y por qué (aplicado en §3.3, salvo las listas)
 
 | Archivo | Qué da por hecho hoy | Qué necesita | Por qué |
 |---|---|---|---|
-| `app/schemas.py` | **`promedio_academico` es obligatorio**, uno de los 5 campos de perfil. Las listas son opcionales | (1) Que `promedio_academico` deje de ser obligatorio. (2) **Que `herramientas_conocidas` y `areas_interes` pasen a ser obligatorias**, admitiendo `[]` (§5.3) | (1) Tal como está, la API **rechazaría con 422** al 97 % de los inscritos de Copacabana y al 63 % de los de Girardota. (2) Evita que se aplique una imputación que el modelo nunca vio |
+| `app/schemas.py` | **`promedio_academico` es obligatorio**, uno de los 5 campos de perfil. Las listas son opcionales | (1) Que `promedio_academico` deje de ser obligatorio. (2) Se propuso hacer obligatorias `herramientas_conocidas` y `areas_interes`; **no se aplicó**, siguen opcionales (§5.3) | (1) Tal como estaba, la API **rechazaba con 422** al 97 % de los inscritos de Copacabana y al 63 % de los de Girardota |
 | `app/core/config.py` | `model_mae = 15.00` y `model_r2 = 0.1766` fijos: son el hold-out de v2 (n = 230) sobre la subpoblación con perfil | Las métricas del modelo oficial, idealmente leídas de `SPEC.meta.metricas`: **MAE 17.86 y R² 0.050 (OOF, n = 3,050, KFold(5))** | `predictor.py` propaga `model_mae` al intervalo de quien no presentó examen. Con 15.00, el intervalo saldría **más estrecho de lo que es** |
 | `app/models/scorer.py` | `sum()` del intérprete para el engagement; ruta por defecto `…/spec_potencial_v2_corrected.json` | (1) Sumar de izquierda a derecha, igual que el `reduce` del JS. (2) Apuntar `SPEC_FILE` al archivo nuevo | (1) Con Python ≥ 3.12, la paridad se rompe sin avisar (§5.2). (2) Operativo |
+
+### 3.3 Cambios aplicados en la API (sin commit, pendientes de pull request)
+
+Aplicados en `../API-mlmodels/copa-stem-api` por instrucción expresa, sin refactorizar ni tocar otros archivos:
+
+| Archivo | Cambio |
+|---|---|
+| `app/models/spec/spec_potencial_global_base.json` | Nuevo: copia byte a byte (mismo SHA-256) del SPEC de 150 árboles. `spec_potencial_v2_corrected.json` se queda como vía de rollback |
+| `app/models/scorer.py` | `SPEC_POR_DEFECTO` y el mensaje de error apuntan al SPEC nuevo. `_engagement` suma de izquierda a derecha con un bucle explícito. Docstrings actualizados (modelo global, 150 árboles, 3,050 examinados) |
+| `app/schemas.py` | `promedio_academico` pasa a `Optional[float] = None`, con los mismos límites; el modelo global no lo usa. Docstrings actualizados; `EstudianteInput` ya no dice "consume el modelo v2". Las listas siguen opcionales |
+| `app/core/config.py` | `model_r2` 0.1766 → **0.0504** y `model_mae` 15.00 → **17.86**. `model_version` sin cambios, porque `loader.py` lo usa para los nombres de los `.joblib` auxiliares |
+| `app/main.py` | La descripción de `/docs` ya no dice "el modelo v2": nombra el modelo global base con la versión que lee del SPEC (`scorer.version_modelo()`) |
+| `app/models/predictor.py` | Nueva excepción `DatoRequeridoFaltante`. `talento_oculto` y `clustering` la lanzan si falta `promedio_academico`, **antes** de evaluar la heurística, en lugar de tratar el dato ausente como criterio no cumplido |
+| `app/routers/estudiantes.py` | `/talento-oculto` y `/clustering` traducen esa excepción a **422** con el motivo. En `/batch`, un estudiante sin promedio recibe `potencial` e `indice_condiciones`, y `talento_oculto`/`clustering` en `null` con la explicación en `error`. Antes perdía el registro entero, incluido su potencial |
+
+**Verificación local:** Python 3.11.9, las versiones exactas de `requirements.txt` y una clave temporal. No se usó `api_keys.json`.
+
+| Llamada | Resultado |
+|---|---|
+| `GET /health` | 200 · `scorer_potencial: global_base`, R² 0.0504, MAE 17.86 |
+| `POST /potencial`, Copacabana, sin `promedio_academico` | **200** · `model_version: global_base` |
+| `POST /talento-oculto` y `POST /clustering`, sin `promedio_academico` (con y sin motivación/gusto) | **422** con el motivo, las 4 llamadas |
+| Las tres, con `promedio_academico` | 200 |
+| `POST /batch` con un estudiante sin promedio y otro con promedio | 200. El primero trae potencial e índice de condiciones, talento y clustering en `null` y `error` explicativo; el segundo, los cuatro análisis |
+| Log del servidor | 0 errores no manejados, 0 respuestas 500 |
+| `verificar_spec()` | 150 árboles, referencia de 3,050 |
+| Paridad del `scorer.py` editado frente al JS, en Python 3.14 | 0 discrepancias en 12,546 comparaciones: la dependencia de la versión de Python quedó eliminada |
+
+**Configuración muerta, registrada sin corregir:** `low_confidence_r2_threshold = 0.10` en `app/core/config.py` **no se lee en ningún archivo de `app/`**. No activa ninguna advertencia: nadie debe suponer que, con R² = 0.0504, un umbral está añadiendo avisos de confianza reducida. La advertencia que llevan hoy las respuestas sin examen es el texto fijo de `predictor.py` para esa rama, que ahora cita el MAE de 17.86.
+
+**Quedan en la API textos de `/docs` desactualizados** que no entraban en el encargo:
+- El docstring de `/v1/estudiantes/potencial` dice que `promedio_academico` es obligatorio, cita "±15 puntos", "200 árboles" y "3.072 examinados".
+- El docstring del módulo `schemas.py` dice "modelo v2".
+- Un mensaje de log de modo demo en `main.py` menciona "modelo v2".
 
 ---
 
@@ -182,18 +219,13 @@ Tolerancias: puntaje crudo **1 × 10⁻⁹**; salida pública (2 decimales) **0.
    - **En producción no aparecen:** el contenedor de la API se fija con `FROM python:3.11-slim` (dato confirmado por el equipo; el `Dockerfile` no se leyó desde aquí), y en 3.11 `sum()` suma de izquierda a derecha.
    - **Fragilidad latente:** la paridad depende de la versión de Python del contenedor. Subir la imagen a 3.12 o posterior la rompería **sin ningún aviso**. La corrección va en `scorer.py` y se gestiona por separado.
 2. **82 de las 87 de `potencial_stem_predictor.py`:** redondeo bancario de `round()` frente a `Math.round`, todas ≤ 0.01 y sin cambio de categoría. Ese predictor no es la ruta de la API.
-3. **Las otras 5 (y las 5 de la ruta de entrenamiento): listas ausentes.** El script 12 y ese predictor cuentan una lista **ausente** como 0; el JS y la API imputan la mediana (2). Diferencia máxima: 3.04 puntos en el crudo y 7.34 en el índice. En el entrenamiento no hay ninguna lista ausente. Queda resuelto por la decisión de §5.3.
+3. **Las otras 5 (y las 5 de la ruta de entrenamiento): listas ausentes.** El script 12 y ese predictor cuentan una lista **ausente** como 0; el JS y la API imputan la mediana (2). Diferencia máxima: 3.04 puntos en el crudo y 7.34 en el índice. En el entrenamiento no hay ninguna lista ausente. Las listas siguen opcionales en la API, así que esta diferencia de convención sigue existiendo para las cargas que omitan el campo (§5.3).
 
-### 5.3 Decisión declarada: listas obligatorias
+### 5.3 Listas ausentes: estado desplegado
 
-**Decisión:** `herramientas_conocidas` y `areas_interes` pasan a ser **campos obligatorios** en la entrada de la API. No se elige ninguna convención de imputación para una lista ausente.
+**Lo que quedó desplegado:** `herramientas_conocidas` y `areas_interes` **siguen siendo opcionales** en `EstudianteInput`, como estaban. En una versión anterior de este informe constaba como decisión declarada hacerlas obligatorias. **No se aplicó**: la instrucción para el cambio de la API fue dejarlas opcionales tal cual.
 
-**Por qué:**
-- Cualquier convención sería una suposición que el modelo nunca vio: el conjunto de entrenamiento tiene **0 listas ausentes**.
-- `herramientas_conocidas` es `NOT NULL` en Supabase, así que los datos reales siempre la traen.
-- Una lista vacía se envía como `[]` y cuenta 0 de forma explícita.
-
-El cambio de esquema se hace en el repo de la API.
+**Consecuencia, sin cambios respecto a antes:** si una lista **no se envía**, el scorer de la API y el JS imputan la **mediana (2)**. Si se envía `[]`, cuentan **0**. El entrenamiento (script 12) contaba una lista ausente como 0, pero el conjunto de entrenamiento tiene **0 listas ausentes**, así que la diferencia solo afecta a cargas de la API que omitan el campo. `herramientas_conocidas` es `NOT NULL` en Supabase, por lo que los datos del formulario siempre la traen. Queda como convención de servicio conocida, no como decisión cerrada.
 
 ### 5.4 Qué se hizo ante las discrepancias
 
@@ -211,11 +243,10 @@ La lista de descartados y `numero_documento` solo existieron en memoria. `output
 
 **Entre sí, sí.** Con los artefactos de 150 árboles, el JS y el scorer de la API en su runtime de producción dan **0 discrepancias en 12,546 comparaciones**. El puntaje crudo es bit a bit idéntico en las 2,091 cargas y ninguna carga cambia de categoría. Los dos llevan el mismo SPEC y el mismo bosque, y el preprocesamiento reproduce el del modelo entrenado.
 
-**En la API, todavía no.** Faltan los cambios de §3.2, que se gestionan en el repo de la API:
-1. `schemas.py`: `promedio_academico` opcional y listas obligatorias.
-2. `config.py`: MAE 17.86 y R² 0.050 del modelo oficial.
-3. `scorer.py`: suma de izquierda a derecha y `SPEC_FILE` apuntando al archivo nuevo.
-4. Medir el arranque en frío con los artefactos nuevos (1.6 veces los vigentes).
+**En la API:** los cambios de §3.2 están aplicados y verificados en local (§3.3), sin commit y pendientes de pull request. Antes de desplegar quedan:
+1. Revisar y fusionar el pull request.
+2. Medir el arranque en frío con los artefactos nuevos (1.6 veces los vigentes).
+3. Actualizar los textos de `/docs` desactualizados listados en §3.3.
 
 ---
 
