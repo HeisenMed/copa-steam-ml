@@ -1,0 +1,291 @@
+{
+  "referencia": {
+    "vigente_F17": {
+      "n": 3072,
+      "media": 41.736653645833336,
+      "sigma_ddof0": 22.65829698223693,
+      "sigma_ddof1": 22.661985756698854,
+      "sigma_declarado_F17": 22.6583
+    },
+    "nueva_3050": {
+      "n": 3050,
+      "media": 41.53934426229508,
+      "sigma_ddof0": 22.49479195600125,
+      "sigma_ddof1": 22.49848053386584
+    },
+    "engagement_vigente": {
+      "n_herramientas": {
+        "lo": 0.0,
+        "hi": 11.0
+      },
+      "n_areas_interes": {
+        "lo": 2.0,
+        "hi": 9.0
+      }
+    },
+    "engagement_nuevo": {
+      "n_herramientas": {
+        "lo": 0.0,
+        "hi": 12.0
+      },
+      "n_areas_interes": {
+        "lo": 1.0,
+        "hi": 9.0
+      }
+    },
+    "engagement_vigente_v1_fallback": {
+      "n_herramientas": {
+        "lo": 0.0,
+        "hi": 12.0
+      },
+      "n_areas_interes": {
+        "lo": 0.0,
+        "hi": 9.0
+      }
+    }
+  },
+  "poblaciones": {
+    "examinados_3050": {
+      "A_solo_referencia": {
+        "total": {
+          "n": 3050,
+          "cambian": 20,
+          "suben": 20,
+          "bajan": 0
+        },
+        "por_municipio": {
+          "Bello": {
+            "n": 729,
+            "cambian": 4,
+            "suben": 4,
+            "bajan": 0
+          },
+          "Copacabana": {
+            "n": 1233,
+            "cambian": 5,
+            "suben": 5,
+            "bajan": 0
+          },
+          "Girardota": {
+            "n": 1088,
+            "cambian": 11,
+            "suben": 11,
+            "bajan": 0
+          }
+        },
+        "transiciones": {
+          "Requiere apoyo -> En desarrollo": 2,
+          "En desarrollo -> Promedio": 2,
+          "Promedio -> Alto potencial": 14,
+          "Alto potencial -> Talento destacado": 2
+        },
+        "distribucion_antes": {
+          "Requiere apoyo": 453,
+          "En desarrollo": 784,
+          "Promedio": 1008,
+          "Alto potencial": 706,
+          "Talento destacado": 99
+        },
+        "distribucion_despues": {
+          "Requiere apoyo": 451,
+          "En desarrollo": 784,
+          "Promedio": 996,
+          "Alto potencial": 718,
+          "Talento destacado": 101
+        }
+      },
+      "B_spec_global": {
+        "total": {
+          "n": 3050,
+          "cambian": 39,
+          "suben": 22,
+          "bajan": 17
+        },
+        "por_municipio": {
+          "Bello": {
+            "n": 729,
+            "cambian": 11,
+            "suben": 11,
+            "bajan": 0
+          },
+          "Copacabana": {
+            "n": 1233,
+            "cambian": 13,
+            "suben": 1,
+            "bajan": 12
+          },
+          "Girardota": {
+            "n": 1088,
+            "cambian": 15,
+            "suben": 10,
+            "bajan": 5
+          }
+        },
+        "transiciones": {
+          "Requiere apoyo -> En desarrollo": 5,
+          "En desarrollo -> Requiere apoyo": 9,
+          "En desarrollo -> Promedio": 2,
+          "Promedio -> En desarrollo": 2,
+          "Promedio -> Alto potencial": 13,
+          "Alto potencial -> Talento destacado": 2,
+          "Talento destacado -> Alto potencial": 6
+        },
+        "distribucion_antes": {
+          "Requiere apoyo": 453,
+          "En desarrollo": 784,
+          "Promedio": 1008,
+          "Alto potencial": 706,
+          "Talento destacado": 99
+        },
+        "distribucion_despues": {
+          "Requiere apoyo": 457,
+          "En desarrollo": 780,
+          "Promedio": 995,
+          "Alto potencial": 723,
+          "Talento destacado": 95
+        }
+      }
+    },
+    "inscritos_sin_examen": {
+      "A_solo_referencia": {
+        "total": {
+          "n": 249,
+          "cambian": 3,
+          "suben": 3,
+          "bajan": 0
+        },
+        "por_municipio": {
+          "Bello": {
+            "n": 42,
+            "cambian": 1,
+            "suben": 1,
+            "bajan": 0
+          },
+          "Copacabana": {
+            "n": 152,
+            "cambian": 2,
+            "suben": 2,
+            "bajan": 0
+          },
+          "Girardota": {
+            "n": 55,
+            "cambian": 0,
+            "suben": 0,
+            "bajan": 0
+          }
+        },
+        "transiciones": {
+          "En desarrollo -> Promedio": 3
+        },
+        "distribucion_antes": {
+          "Requiere apoyo": 0,
+          "En desarrollo": 135,
+          "Promedio": 111,
+          "Alto potencial": 3,
+          "Talento destacado": 0
+        },
+        "distribucion_despues": {
+          "Requiere apoyo": 0,
+          "En desarrollo": 132,
+          "Promedio": 114,
+          "Alto potencial": 3,
+          "Talento destacado": 0
+        }
+      },
+      "B_spec_global": {
+        "total": {
+          "n": 249,
+          "cambian": 61,
+          "suben": 27,
+          "bajan": 34
+        },
+        "por_municipio": {
+          "Bello": {
+            "n": 42,
+            "cambian": 9,
+            "suben": 6,
+            "bajan": 3
+          },
+          "Copacabana": {
+            "n": 152,
+            "cambian": 28,
+            "suben": 17,
+            "bajan": 11
+          },
+          "Girardota": {
+            "n": 55,
+            "cambian": 24,
+            "suben": 4,
+            "bajan": 20
+          }
+        },
+        "transiciones": {
+          "En desarrollo -> Promedio": 26,
+          "Promedio -> En desarrollo": 32,
+          "Promedio -> Alto potencial": 1,
+          "Alto potencial -> Promedio": 2
+        },
+        "distribucion_antes": {
+          "Requiere apoyo": 0,
+          "En desarrollo": 135,
+          "Promedio": 111,
+          "Alto potencial": 3,
+          "Talento destacado": 0
+        },
+        "distribucion_despues": {
+          "Requiere apoyo": 0,
+          "En desarrollo": 141,
+          "Promedio": 106,
+          "Alto potencial": 2,
+          "Talento destacado": 0
+        }
+      }
+    }
+  },
+  "pasos": {
+    "A_solo_referencia": "mismo esquema v2/v1_fallback, ref_rendimiento 3,072 → 3,050",
+    "B_spec_global": "SPEC global para todos: ref y engagement de 3,050 + imputación del modelo global (+ su predicción, para quien no presentó)"
+  },
+  "control_produccion": {
+    "con_fila_en_produccion": 3050,
+    "misma_categoria_que_produccion": 3047,
+    "distintas_por_municipio": {
+      "Copacabana": 3
+    },
+    "nota": "las distintas son documentos duplicados cuya fila en producción es la sesión abandonada (keep='first'); aquí se usa la completada"
+  },
+  "correccion_dedup_comunicado_vs_fila_correcta": {
+    "total": {
+      "n": 3,
+      "cambian": 3,
+      "suben": 3,
+      "bajan": 0
+    },
+    "por_municipio": {
+      "Copacabana": {
+        "n": 3,
+        "cambian": 3,
+        "suben": 3,
+        "bajan": 0
+      }
+    },
+    "transiciones": {
+      "Requiere apoyo -> Promedio": 2,
+      "Requiere apoyo -> Talento destacado": 1
+    },
+    "distribucion_antes": {
+      "Requiere apoyo": 3,
+      "En desarrollo": 0,
+      "Promedio": 0,
+      "Alto potencial": 0,
+      "Talento destacado": 0
+    },
+    "distribucion_despues": {
+      "Requiere apoyo": 0,
+      "En desarrollo": 0,
+      "Promedio": 2,
+      "Alto potencial": 0,
+      "Talento destacado": 1
+    }
+  }
+}

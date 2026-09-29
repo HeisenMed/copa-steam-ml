@@ -1,0 +1,201 @@
+{
+  "generado": "2026-09-29T02:55:56.298446+00:00",
+  "salida": "../_datos_privados/ml_scores_2026_ref3050.csv (fuera del repo: identifica estudiantes)",
+  "esquema": "v2 si tiene perfil / v1_fallback si no — el mismo con el que se publicó",
+  "referencia": {
+    "n": 3050,
+    "media": 41.53934426229508,
+    "sigma_ddof0": 22.49479195600125
+  },
+  "control_reproduccion": {
+    "examinados": {
+      "filas_nuevo": 3072,
+      "filas_publicado": 3072,
+      "mismos_documentos": true,
+      "columnas_con_diferencias": {}
+    },
+    "sin_examen": {
+      "filas_nuevo": 248,
+      "filas_publicado": 248,
+      "mismos_documentos": true,
+      "columnas_con_diferencias": {}
+    }
+  },
+  "filas": {
+    "examinados": 3072,
+    "sin_examen": 248,
+    "total": 3320
+  },
+  "modelo_version": {
+    "v1_fallback": 2081,
+    "v2": 1239
+  },
+  "duplicados": {
+    "documentos_duplicados": 5,
+    "filas_corregidas": 3
+  },
+  "cambios_categoria": {
+    "examinados_3050_limpios_sin_los_3": {
+      "total": {
+        "n": 3047,
+        "cambian": 19,
+        "suben": 19,
+        "bajan": 0
+      },
+      "por_municipio": {
+        "Bello": {
+          "n": 729,
+          "cambian": 4,
+          "suben": 4,
+          "bajan": 0
+        },
+        "Girardota": {
+          "n": 1088,
+          "cambian": 11,
+          "suben": 11,
+          "bajan": 0
+        },
+        "Copacabana": {
+          "n": 1230,
+          "cambian": 4,
+          "suben": 4,
+          "bajan": 0
+        }
+      },
+      "transiciones": {
+        "Alto potencial -> Talento destacado": 2,
+        "En desarrollo -> Promedio": 2,
+        "Promedio -> Alto potencial": 13,
+        "Requiere apoyo -> En desarrollo": 2
+      }
+    },
+    "examinados_3_filas_corregidas": {
+      "total": {
+        "n": 3,
+        "cambian": 3,
+        "suben": 3,
+        "bajan": 0
+      },
+      "por_municipio": {
+        "Copacabana": {
+          "n": 3,
+          "cambian": 3,
+          "suben": 3,
+          "bajan": 0
+        }
+      },
+      "transiciones": {
+        "Requiere apoyo -> Alto potencial": 1,
+        "Requiere apoyo -> Promedio": 1,
+        "Requiere apoyo -> Talento destacado": 1
+      }
+    },
+    "examinados_22_resto_publicado": {
+      "total": {
+        "n": 22,
+        "cambian": 0,
+        "suben": 0,
+        "bajan": 0
+      },
+      "por_municipio": {
+        "Bello": {
+          "n": 18,
+          "cambian": 0,
+          "suben": 0,
+          "bajan": 0
+        },
+        "Girardota": {
+          "n": 4,
+          "cambian": 0,
+          "suben": 0,
+          "bajan": 0
+        }
+      },
+      "transiciones": {}
+    },
+    "examinados_total": {
+      "total": {
+        "n": 3072,
+        "cambian": 22,
+        "suben": 22,
+        "bajan": 0
+      },
+      "por_municipio": {
+        "Bello": {
+          "n": 747,
+          "cambian": 4,
+          "suben": 4,
+          "bajan": 0
+        },
+        "Girardota": {
+          "n": 1092,
+          "cambian": 11,
+          "suben": 11,
+          "bajan": 0
+        },
+        "Copacabana": {
+          "n": 1233,
+          "cambian": 7,
+          "suben": 7,
+          "bajan": 0
+        }
+      },
+      "transiciones": {
+        "Alto potencial -> Talento destacado": 2,
+        "En desarrollo -> Promedio": 2,
+        "Promedio -> Alto potencial": 13,
+        "Requiere apoyo -> Alto potencial": 1,
+        "Requiere apoyo -> En desarrollo": 2,
+        "Requiere apoyo -> Promedio": 1,
+        "Requiere apoyo -> Talento destacado": 1
+      }
+    },
+    "sin_examen": {
+      "total": {
+        "n": 248,
+        "cambian": 3,
+        "suben": 3,
+        "bajan": 0
+      },
+      "por_municipio": {
+        "Bello": {
+          "n": 42,
+          "cambian": 1,
+          "suben": 1,
+          "bajan": 0
+        },
+        "Girardota": {
+          "n": 55,
+          "cambian": 0,
+          "suben": 0,
+          "bajan": 0
+        },
+        "Copacabana": {
+          "n": 151,
+          "cambian": 2,
+          "suben": 2,
+          "bajan": 0
+        }
+      },
+      "transiciones": {
+        "En desarrollo -> Promedio": 3
+      }
+    }
+  },
+  "otras_columnas_que_cambian": {
+    "examinados": {
+      "indice_potencial": 2901,
+      "componente_rendimiento": 2835,
+      "componente_resiliencia": 2441,
+      "categoria_potencial": 22,
+      "es_talento_oculto": 3,
+      "probabilidad_talento": 275
+    },
+    "sin_examen": {
+      "indice_potencial": 248,
+      "componente_rendimiento": 248,
+      "categoria_potencial": 3,
+      "probabilidad_talento": 1
+    }
+  }
+}

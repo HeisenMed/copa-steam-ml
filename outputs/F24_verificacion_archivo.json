@@ -1,0 +1,25 @@
+{
+  "archivo_sha256": "2a5fc1e2c2da516dd830660962c7175900a7a3dc3a63f374ea3e60c3d946d26c",
+  "archivo_sin_modificar": true,
+  "recalculo_vs_archivo": {
+    "filas_nuevo": 3320,
+    "filas_publicado": 3320,
+    "mismos_documentos": true,
+    "columnas_con_diferencias": {}
+  },
+  "dependencias": "SPEC v1 del predictor Python de despliegue, SPEC v2 de potencial_stem_predictor_v2.js y la referencia de 3,050 (datos); NO usa models/modelo_global_base.joblib",
+  "es_talento_oculto_direccion": {
+    "examinado": {
+      "entran_a_la_lista": 3,
+      "salen_de_la_lista": 0,
+      "en_lista_publicado": 609,
+      "en_lista_nuevo": 612
+    },
+    "sin_examen": {
+      "entran_a_la_lista": 0,
+      "salen_de_la_lista": 0,
+      "en_lista_publicado": 0,
+      "en_lista_nuevo": 0
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "adaptador": {
+    "n_filas": 3050,
+    "n_columnas": 19,
+    "matriz_identica": true,
+    "filas_con_diferencia": 0,
+    "pred_max_abs_diff_vs_sklearn": 1.4210854715202004e-14,
+    "pred_exactamente_iguales": 2302
+  },
+  "artefactos": {
+    "spec_json": {
+      "ruta": "models/deploy/spec_potencial_global_base.json",
+      "bytes": 1120939
+    },
+    "js": {
+      "ruta": "models/deploy/potencial_stem_predictor_global_base.js",
+      "bytes": 1356087
+    },
+    "vigente": {
+      "spec_json_bytes": 700317,
+      "js_bytes": 847905,
+      "arboles": 200,
+      "nodos": 27212,
+      "n_features": 23
+    },
+    "arboles": 150,
+    "nodos": 44734,
+    "hojas": 22442,
+    "n_features": 19,
+    "cadena_formato_verificada": true
+  },
+  "paridad": {
+    "node": "v24.13.0",
+    "n_cargas": 2091,
+    "n_comparaciones": 12546,
+    "tolerancias": {
+      "puntaje_crudo": 1e-09,
+      "indice_y_componentes": 0.01,
+      "categoria": "igualdad exacta"
+    },
+    "cargas_con_discrepancia": 87,
+    "max_abs_diff_crudo": 3.0445860792926993,
+    "crudo_bit_a_bit_identico": 2086,
+    "max_abs_diff_indice": 7.339999999999996,
+    "categorias_distintas": 0,
+    "discrepancias_por_causa": {
+      "redondeo_bancario_round()": 82,
+      "lista_ausente_0_vs_mediana": 5
+    },
+    "ruta_python": "models/deploy/potencial_stem_predictor.py (pot.calcular_indice)",
+    "por_tipo": [
+      {
+        "tipo": "faltante",
+        "n": 42,
+        "max_d_crudo": 3.0445860792926993,
+        "max_d_indice": 7.339999999999996
+      },
+      {
+        "tipo": "listas",
+        "n": 10,
+        "max_d_crudo": 0.0,
+        "max_d_indice": 0.0
+      },
+      {
+        "tipo": "onehot",
+        "n": 18,
+        "max_d_crudo": 0.0,
+        "max_d_indice": 0.0
+      },
+      {
+        "tipo": "oov",
+        "n": 12,
+        "max_d_crudo": 0.0,
+        "max_d_indice": 0.010000000000005116
+      },
+      {
+        "tipo": "sintetica",
+        "n": 2000,
+        "max_d_crudo": 0.0,
+        "max_d_indice": 0.010000000000005116
+      },
+      {
+        "tipo": "tipos",
+        "n": 8,
+        "max_d_crudo": 0.0,
+        "max_d_indice": 0.0
+      },
+      {
+        "tipo": "todo_ausente",
+        "n": 1,
+        "max_d_crudo": 2.086146903159978,
+        "max_d_indice": 3.6499999999999986
+      }
+    ],
+    "ruta_entrenamiento_vs_js": {
+      "cargas_con_diferencia_gt_1e-9": 5,
+      "max_abs_diff": 3.0445860792926993,
+      "tipos_con_diferencia": {
+        "faltante:ausente": 2,
+        "faltante:none": 2,
+        "todo_ausente": 1
+      }
+    }
+  },
+  "paridad_scorer_api": {
+    "python": "3.14.0",
+    "n_cargas": 2091,
+    "n_comparaciones": 12546,
+    "sum_interprete_actual": {
+      "crudo_bit_a_bit": 2091,
+      "max_abs_diff_crudo": 0.0,
+      "salida_publica_identica": 2084,
+      "max_abs_diff_salida_publica": 0.010000000000005116,
+      "categorias_distintas": 0,
+      "cargas_con_discrepancia": 7
+    },
+    "suma_ingenua": {
+      "crudo_bit_a_bit": 2091,
+      "max_abs_diff_crudo": 0.0,
+      "salida_publica_identica": 2091,
+      "max_abs_diff_salida_publica": 0.0,
+      "categorias_distintas": 0,
+      "cargas_con_discrepancia": 0
+    },
+    "version_modelo_leida_por_la_api": "global_base",
+    "vocabulario_municipio_leido_por_la_api": [
+      "Bello",
+      "Copacabana",
+      "Girardota"
+    ]
+  }
+}

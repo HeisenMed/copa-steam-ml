@@ -118,6 +118,21 @@ V1_OFICIAL = {"r2_oof": 0.084, "mae": 18.1, "rmse": 22.1,
 
 N_BOOT = 2000
 
+# Tamaño del bosque del modelo OFICIAL. Decisión del informe 23, §9: 150 en vez
+# de los 300 del script 12. La pérdida medida (R² OOF −0.0011) es unas veinte
+# veces menor que el IC 95 % de la propia métrica (±0.023) y los artefactos de
+# despliegue ocupan la mitad. El resto de hiperparámetros es el del script 12.
+# Las réplicas de los protocolos de los scripts 12 y 13 (complementos 1 y 3)
+# conservan los 300 del script 12: su propósito es reproducir esas cifras.
+N_ESTIMADORES = 150
+
+
+def pipeline_oficial(numericas, binarias, onehot):
+    """Pipeline del script 12 con el tamaño de bosque del modelo oficial."""
+    pipe = s12.construir_pipeline(numericas, binarias, onehot)
+    pipe.set_params(rf__n_estimators=N_ESTIMADORES)
+    return pipe
+
 # Duración por encima de la cual una sesión no pudo ser un examen completado
 # por el estudiante: 3 h, el doble del p99 de Copacabana (~5,400 s).
 UMBRAL_SESION_ABANDONADA_S = 3 * 3600
@@ -362,12 +377,13 @@ def entrenar(df: pd.DataFrame) -> tuple[dict, object, pd.DataFrame, pd.Series,
     y = df[TARGET].astype(float)
     assert not any(c in X.columns for c in s12.NUEVAS_NUM + s12.NUEVAS_BIN), \
         "el bloque de perfil no debe entrar al modelo global"
-    base = s12.construir_pipeline(numericas, binarias, onehot)
+    base = pipeline_oficial(numericas, binarias, onehot)
     log(f"predictores: {len(numericas) + len(binarias) + len(onehot)} "
         f"({numericas + binarias + onehot})")
 
     res: dict = {"modelo": "RandomForestRegressor", "hiperparametros":
-                 {k: v for k, v in s12.MODELO_KWARGS.items() if k != "n_jobs"},
+                 {**{k: v for k, v in s12.MODELO_KWARGS.items() if k != "n_jobs"},
+                  "n_estimators": N_ESTIMADORES},
                  "predictores": {"numericas": numericas, "binarias": binarias,
                                  "onehot": onehot}}
 
@@ -522,7 +538,7 @@ def oof_y_dp(d: pd.DataFrame, extra: dict[str, str] | None = None) -> dict:
         X[c] = d[c].to_numpy()
         (num if kind == "num" else oh).append(c)
     y = d[TARGET].astype(float)
-    base = s12.construir_pipeline(num, binr, oh)
+    base = pipeline_oficial(num, binr, oh)
     cv = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
     oof = cross_val_predict(clone(base), X, y, cv=cv, n_jobs=-1)
     m = metricas(y, oof)

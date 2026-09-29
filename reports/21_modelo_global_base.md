@@ -6,6 +6,23 @@ Fecha: 2026-09-28 · `random_state = 42`
 
 ---
 
+> **ANEXO (2026-09-28): el modelo oficial tiene ahora 150 árboles.** Por decisión del informe 23, §9, se reentrenó `models/modelo_global_base.joblib` con `n_estimators = 150` en lugar de 300; todo lo demás, igual. La pérdida (R² OOF −0.0011) es unas veinte veces menor que el IC 95 % de la métrica, y los artefactos de despliegue ocupan la mitad. **El cuerpo de este informe describe la versión de 300 árboles.** `outputs/F21_modelo_global_base.json` ya contiene las cifras de 150. Cifras oficiales vigentes:
+>
+> | Cifra | 300 (cuerpo del informe) | **150 (oficial)** | n · partición |
+> |---|---:|---:|---|
+> | R² OOF [IC 95 %] | 0.052 [0.028, 0.073] | **0.050 [0.027, 0.072]** | 3,050 · KFold(5) |
+> | MAE / RMSE OOF | 17.85 / 21.91 | **17.86 / 21.92** | 3,050 · KFold(5) |
+> | R² / MAE / RMSE hold-out | 0.031 / 17.66 / 21.82 | **0.030 / 17.66 / 21.83** | 610 · 20 % estratificado |
+> | OOF por municipio (R² / MAE) | Bello 0.080/15.56 · Gir. 0.057/18.91 · Copa. 0.019/18.27 | **Bello 0.079/15.57 · Gir. 0.055/18.92 · Copa. 0.019/18.28** | 729 / 1,088 / 1,233 |
+> | Dependencia parcial Gir. / Bello / Copa. | 42.30 / 41.74 / 40.56 | **42.28 / 41.80 / 40.55** | 3,050 |
+> | Copacabana − Girardota (DP) | −1.75 | **−1.73** | 3,050 |
+> | Ídem, con mes de inscripción (diagnóstico) | −4.20 | **−4.10** | 3,050 |
+> | Sensibilidad sin las 14 sesiones > 3 h: R² / MAE / Copa. − Gir. | 0.050 / 17.80 / −1.67 | **0.051 / 17.79 / −1.63** | 3,036 · KFold(5) |
+> | Permutación de `municipio` (hold-out, 20 repeticiones) | 0.003 ± 0.009 | **0.005 ± 0.009** | 610 |
+> | R² de este modelo sobre la SD de v1 (§3.3) | 0.101 | **0.100** | — |
+>
+> Ninguna conclusión cambia: el orden Girardota > Bello > Copacabana se mantiene, la contribución propia del municipio sigue entre una cuarta parte y la mitad de la brecha cruda, y la caída de R² frente a v1 sigue explicándose por la varianza del target. Las réplicas de los protocolos de los scripts 12 y 13 (§3.3 dispersión A → B y §4.1 reconciliación con F13) conservan sus 300 árboles, porque su propósito es reproducir esas cifras.
+
 ## 0. Resumen
 
 - Se entrenó **un solo modelo** que puntúa a todos los estudiantes de Bello, Girardota y Copacabana con el **mismo conjunto de 13 predictores**. No usa las 5 preguntas de perfil académico. Reemplaza a v1 en producción. v2 no se tocó y queda como artefacto de investigación.
