@@ -90,6 +90,18 @@ Cada script es **autocontenido y reproducible** (`random_state=42`). Los gráfic
 | 5 | `13_analisis_explicabilidad.py` | Importancia MDI y por permutación sobre A y C — qué variables pesan y cuánto |
 | 5 | `14_optimizacion_hiperparametros.py` | `RandomizedSearchCV` del modelo v2 + export del predictor JS de despliegue |
 | 5 | `15_generar_scores_v2.py` | Ejecución en sombra del vector `ml_scores` con modelo híbrido v2/v1 |
+| 5 | `16_visualizaciones_comparacion_v2.py` | Cuatro figuras de la comparación v1 vs v2. No entrena ni recalcula: lee artefactos de los scripts 13 y 15 |
+| 5 | `17_fix_ref_rendimiento.py` | Corrige `ref_rendimiento`: la referencia pasa de los 1.148 de C a los 3.072 examinados. 72 estudiantes cambiaban de categoría sin que su desempeño variara |
+| 5 | `18_scores_inscritos_sin_examen.py` | Puntúa a los inscritos que no presentaron el examen, el único grupo donde el modelo de puntaje sí interviene |
+| 5 | `19_regenerar_deploy_v2.py` | Regenera el predictor JS de despliegue con la referencia corregida (n = 3.072) |
+| 6 | `21_modelo_global_base.py` | Modelo único de producción sobre el bloque base, sin perfil académico, para que los tres municipios sean comparables |
+| 6 | `23_exportar_modelo_global.py` | Exporta el modelo global a los formatos de despliegue y verifica paridad Python ↔ JS. Mueve la referencia a los 3.050 limpios |
+| 6 | `24_scores_cohorte_2026_ref3050.py` | Repuntúa la cohorte 2026 publicada con la referencia de 3.050 y corrige 3 documentos duplicados |
+| 6 | `25_experimento_n_estimators.py` | Experimento lateral: qué costaría bajar de 300 a 150 árboles. No reentrena ni reemplaza nada |
+
+> **Huecos en la numeración.** No hay scripts 20 ni 22: esos números corresponden a
+> `reports/20_reconciliacion_metricas_v1.md` y `reports/22_auditoria_modelos.md`, que son
+> auditorías documentales sin script asociado.
 
 ---
 
