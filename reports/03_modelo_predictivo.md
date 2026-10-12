@@ -1,6 +1,6 @@
 # Modelo Predictivo del Puntaje — Copa STEM 2026
 
-**Fundación SapienceLab** · Fase 2 · Informe generado: 2026-07-06 07:51
+**Fundación SapienceLab** · Fase 2 · Informe generado: 2026-10-03 19:37
 
 ---
 
@@ -74,7 +74,7 @@ real dentro de un margen de **3.6e-14** puntos.
 **Reglas de decisión (ejemplo, primer árbol):**
 
 ```
-# Ejemplo: árbol 1 de 300. Predicción = PROMEDIO de las hojas de todos los árboles + sesgo(-0.0000).
+# Ejemplo: árbol 1 de 300. Predicción = PROMEDIO de las hojas de todos los árboles + sesgo(0.0000).
 si [municipio=Copacabana] <= 0.5000:
   si [n_areas_interes] <= 2.5000:
     si [grado_escolar] <= 10.5000:

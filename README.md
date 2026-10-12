@@ -25,6 +25,42 @@ ml-models/
 
 ---
 
+## Cómo correr este repositorio
+
+**El dataset real no se publica**: contiene datos personales de menores de edad. Para que el
+código se pueda verificar sin él, `datos_ejemplo/` trae datos **sintéticos** (inventados) con el
+mismo esquema. Cualquier resultado obtenido con ellos carece de significado: solo demuestran que
+el código corre. Detalles en `datos_ejemplo/README.md`.
+
+Requisitos: **Python 3.14.0** (fijado en `.python-version`) y las versiones de `requirements.txt`.
+
+```powershell
+git clone https://github.com/HeisenMed/copa-steam-ml.git
+cd copa-steam-ml
+py -3.14 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# (opcional) regenerar los datos de ejemplo; salen idénticos por la semilla fija
+python notebooks\00_generar_datos_ejemplo.py
+
+# colocar los datos de ejemplo donde los scripts esperan los reales
+mkdir data
+copy datos_ejemplo\copa_stem_dataset_SINTETICO.csv data\copa_stem_dataset.csv
+copy datos_ejemplo\copa_stem_dataset_2026-08_SINTETICO.csv data\copa_stem_dataset_2026-08.csv.csv
+
+python notebooks\01_analisis_exploratorio.py
+python notebooks\03_modelo_predictivo.py
+```
+
+> **Hágalo en un clon aparte.** Los scripts sobrescriben archivos versionados de `outputs/`,
+> `models/` y `reports/` con resultados sin significado. No los suba al repositorio.
+
+Verificado con los datos de ejemplo (2026-10-12): los scripts 01, 02, 03, 04, 05, 05b, 05c, 06,
+07, 11 y 12 terminan sin error. El resto no se probó.
+
+---
+
 ## Dataset — `data/copa_stem_dataset.csv`
 
 | Grupo | Variables |
